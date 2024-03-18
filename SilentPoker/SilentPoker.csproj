@@ -11,10 +11,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Data\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\ServiceNowAPI\ServiceNowAPI.csproj" />
     <ProjectReference Include="..\SQLDataLibrary\DataLibrary.csproj" />
   </ItemGroup>

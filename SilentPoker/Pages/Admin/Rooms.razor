@@ -1,0 +1,51 @@
+﻿@page "/admin/rooms"
+
+@using SilentPoker.Models
+@using SilentPoker.Services
+
+@inject IConfiguration _config
+@inject PokerDatabase _pokerDatabase
+
+<h3>Rooms</h3>
+
+@if (rooms == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <a href="Admin/RoomEdit" class="btn btn-primary">Add New Room</a>
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Room Name</th>
+                <th>Sprint ID</th>
+                <th style="width:64px">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var room in rooms)
+            {
+                <tr>
+                    <td>@room.Name</td>
+                    <td>@room.Sprint</td>
+                    <td>
+                        <a href="Admin/RoomEdit/@room.Id"> Edit</a>
+                        <a href="RoomDelete/@room.Id"> Delete</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    List<Room>? rooms;
+
+    protected override async Task OnInitializedAsync()
+    {
+        rooms = await _pokerDatabase.GetRooms();
+    }
+
+}
