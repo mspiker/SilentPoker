@@ -9,7 +9,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataLibrary", "SQLDataLibra
 EndProject
 Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "SilentPokerDB", "SilentPokerDB\SilentPokerDB.sqlproj", "{BF8689AF-1C2F-4493-89DE-0E3C23FA2CFC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServiceNowAPI", "ServiceNowAPI\ServiceNowAPI.csproj", "{A7316838-D63D-40C2-AE00-1CE83F5E57C2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EndpointAPI", "ServiceNowAPI\EndpointAPI.csproj", "{A7316838-D63D-40C2-AE00-1CE83F5E57C2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
