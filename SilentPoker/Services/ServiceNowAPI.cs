@@ -14,8 +14,8 @@ namespace SilentPoker.Services
 
         public async Task<List<Sprint>?> GetSprints()
         {
-            var result = await _endpointLibrary.CallAPI<Sprint?>(
-                _endpointLibrary.Endpoint("rm_sprint", "active=true", "number%2Cshort_description%2Csys_id"));
+            var result = await _endpointLibrary.CallAPI<Sprint>(
+                EndpointLibrary.Endpoint("rm_sprint", "active=true", "number%2Cshort_description%2Csys_id"));
             return result;
         }
 

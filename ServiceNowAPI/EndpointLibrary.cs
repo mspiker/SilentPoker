@@ -8,11 +8,10 @@ namespace EndpointAPI
 
         public EndpointLibrary(string BaseAddress, string AuthorizationHeader)
         {
-            _httpClient = new HttpClient();
-            _httpClient.BaseAddress = new Uri(BaseAddress);
+            _httpClient = new HttpClient { BaseAddress = new Uri(BaseAddress) };
             _httpClient.DefaultRequestHeaders.Add("Authorization", AuthorizationHeader);
         }
-        public string Endpoint(string table, string query, string fields)
+        public static string Endpoint(string table, string query, string fields)
         {
             string endpoint = $"/api/now/table/{table}?sysparm_query={query}&sysparm_display_value=true&sysparm_exclude_reference_link=true&sysparm_fields={fields}";
             return endpoint;

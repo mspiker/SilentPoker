@@ -6,8 +6,8 @@ namespace SilentPoker.Services
 {
     public class PokerDatabase
     {
-        private string _connectionString;
-        private IDataLibrary _data;
+        private readonly string _connectionString;
+        private readonly IDataLibrary _data;
 
         public PokerDatabase(string connectionString)
         {
@@ -51,10 +51,10 @@ namespace SilentPoker.Services
                     VALUES (@Name, @Sprint, @Filter, @AllowPass);", 
                 new
                 {
-                    Name = room.Name,
-                    Sprint = room.Sprint,
-                    Filter = room.Filter,
-                    AllowPass = room.AllowPass
+                    room.Name,
+                    room.Sprint,
+                    room.Filter,
+                    room.AllowPass
                 }, 
                 _connectionString);
         }
@@ -67,11 +67,11 @@ namespace SilentPoker.Services
                     SET Name = @Name, Sprint = @Sprint, Filter = @Filter, AllowPass = @AllowPass 
                     WHERE Id = @Id;", 
                 new {
-                    Id = room.Id,
-                    Name = room.Name,
-                    Sprint = room.Sprint,
-                    Filter = room.Filter,
-                    AllowPass = room.AllowPass
+                    room.Id,
+                    room.Name,
+                    room.Sprint,
+                    room.Filter,
+                    room.AllowPass
                 }, 
                 _connectionString);
         }

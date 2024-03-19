@@ -13,27 +13,21 @@ namespace DataLibrary
     {
         public async Task<List<T>> GetRecords<T, U>(string sql, U parameters, string connectionString)
         {
-            using (IDbConnection connection = new SqlConnection(connectionString))
-            {
-                var data = await connection.QueryAsync<T>(sql, parameters);
-                return data.ToList();
-            }
+            using IDbConnection connection = new SqlConnection(connectionString);
+            var data = await connection.QueryAsync<T>(sql, parameters);
+            return data.ToList();
         }
         public async Task<T?> GetRecord<T, U>(string sql, U parameters, string connectionString)
         {
-            using (IDbConnection connection = new SqlConnection(connectionString))
-            {
-                var data = await connection.QueryFirstOrDefaultAsync<T>(sql, parameters);
-                return data;
-            }
+            using IDbConnection connection = new SqlConnection(connectionString);
+            var data = await connection.QueryFirstOrDefaultAsync<T>(sql, parameters);
+            return data;
         }
         public async Task<int> Execute<T>(string sql, T parameters, string connectionString)
         {
-            using (IDbConnection connection = new SqlConnection(connectionString))
-            {
-                int x = await connection.ExecuteAsync(sql, parameters);
-                return x;
-            }
+            using IDbConnection connection = new SqlConnection(connectionString);
+            int x = await connection.ExecuteAsync(sql, parameters);
+            return x;
         }
     }
 }
