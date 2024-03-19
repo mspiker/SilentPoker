@@ -5,6 +5,7 @@
 
 @inject IConfiguration _config
 @inject PokerDatabase _pokerDatabase
+@inject ServiceNowAPI _serviceNowAPI
 @inject NavigationManager NavigationManager
 
 <h3>Room</h3>
@@ -24,18 +25,18 @@ else
             <label for="Sprint" class="form-label">Sprint</label>
             <select @bind="room.Sprint" class="form-control" id="Sprint" aria-describedby="NameHelp">
 
-                @* @if (sprints == null)
+                @if (sprints == null)
                 {
                     <option value="">Loading...</option>
                 }
                 else
                 {
                     <option value="">Choose a sprint</option>
-                    foreach (SprintModel s in sprints)
+                    foreach (Sprint s in sprints)
                     {
                         <option value="@s.sys_id">@s.short_description</option>
                     }
-                } *@
+                }
 
             </select>
         </div>
@@ -56,7 +57,6 @@ else
         else
         {
             <button type="button" class="btn btn-primary" @onclick="UpdateData">Update changes</button>
-            @* <button type="button" class="btn btn-primary" @onclick="GetStories">Load Stories</button> *@
         }
     </div>
 }
@@ -67,6 +67,7 @@ else
     public int? id { get; set; }
 
     Room room;
+    List<Sprint> sprints;
     bool isAdd;
 
     private async Task InsertData()
@@ -93,7 +94,7 @@ else
             room = new Room();
             isAdd = true;
         }
-        //sprints = await _pokerDatabase.GetSprints();
+        sprints = await _serviceNowAPI.GetSprints();
     }
 
 }

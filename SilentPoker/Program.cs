@@ -18,7 +18,12 @@ builder.Services.AddAuthorization(options =>
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddSingleton<PokerDatabase>(
-    _ => new PokerDatabase(builder.Configuration.GetConnectionString("default")));
+    _ => new PokerDatabase(
+        builder.Configuration.GetConnectionString("default")));
+builder.Services.AddSingleton<ServiceNowAPI>(
+    _ => new ServiceNowAPI(
+        builder.Configuration["ServiceNow:BaseAddress"],
+        builder.Configuration["ServiceNow:AuthorizationHeader"]));
 
 var app = builder.Build();
 
