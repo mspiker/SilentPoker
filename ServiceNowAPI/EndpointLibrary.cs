@@ -27,7 +27,13 @@ namespace EndpointAPI
                 JObject root = JObject.Parse(content);
                 if (root != null)
                     if (root.ContainsKey("result"))
-                        return root["result"].ToObject<List<T>>();
+                    {
+                        var result = root["result"];
+                        if (result != null)
+                        {
+                            return result.ToObject<List<T>>();
+                        }
+                    }
                 return null;
             }
             else

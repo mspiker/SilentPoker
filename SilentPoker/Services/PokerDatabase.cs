@@ -9,12 +9,6 @@ namespace SilentPoker.Services
         private string _connectionString;
         private IDataLibrary _data;
 
-        /// <summary>
-        /// Instantiates a new instance of PokerDatabase.  To configure for DI use the following:
-        /// builder.Services.AddSingleton<PokerDatabase>(
-        ///     _ => new PokerDatabase(builder.Configuration.GetConnectionString("default")));
-        /// </summary>
-        /// <param name="connectionString"></param>
         public PokerDatabase(string connectionString)
         {
             _data = new SQLDataLibrary();
@@ -38,6 +32,15 @@ namespace SilentPoker.Services
                 new { Id = id }, 
                 _connectionString);
             return rooms.FirstOrDefault();
+        }
+
+        public async Task DeleteRoom(int id)
+        {
+            // Delete a room from the database by id
+            await _data.Execute(
+                @"DELETE FROM Rooms WHERE Id = @Id", 
+                new { Id = id }, 
+                _connectionString);
         }
         
         public async Task AddRoom(Room room)
