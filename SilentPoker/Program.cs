@@ -24,6 +24,7 @@ builder.Services.AddSingleton<ServiceNowAPI>(
     _ => new ServiceNowAPI(
         builder.Configuration["ServiceNow:BaseAddress"],
         builder.Configuration["ServiceNow:AuthorizationHeader"]));
+builder.Services.AddHttpContextAccessor();
 
 var app = builder.Build();
 

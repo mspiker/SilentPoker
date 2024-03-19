@@ -59,6 +59,7 @@
   </ItemGroup>
   <ItemGroup>
     <Build Include="Rooms.sql" />
+    <Build Include="Votes.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="SilentPokerDB.publish.xml" />

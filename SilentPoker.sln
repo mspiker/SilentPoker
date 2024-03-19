@@ -5,11 +5,11 @@ VisualStudioVersion = 17.9.34701.34
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SilentPoker", "SilentPoker\SilentPoker.csproj", "{7044BC6E-B0AC-4774-BC0C-75B37EEBE0EC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataLibrary", "SQLDataLibrary\DataLibrary.csproj", "{7FEDB365-885A-4643-977C-4FBB3C19D3F5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataLibrary", "SQLDataLibrary\DataLibrary.csproj", "{7FEDB365-885A-4643-977C-4FBB3C19D3F5}"
 EndProject
 Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "SilentPokerDB", "SilentPokerDB\SilentPokerDB.sqlproj", "{BF8689AF-1C2F-4493-89DE-0E3C23FA2CFC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EndpointAPI", "ServiceNowAPI\EndpointAPI.csproj", "{A7316838-D63D-40C2-AE00-1CE83F5E57C2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EndpointAPI", "ServiceNowAPI\EndpointAPI.csproj", "{A7316838-D63D-40C2-AE00-1CE83F5E57C2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

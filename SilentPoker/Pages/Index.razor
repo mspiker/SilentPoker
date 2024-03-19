@@ -1,5 +1,131 @@
 ﻿@page "/"
 
+@using SilentPoker.Models
+@using SilentPoker.Services
+@using SilentPoker.Pages
+
+@inject IConfiguration _config
+@inject PokerDatabase _pokerDatabase
+@inject ServiceNowAPI _serviceNowAPI
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+
 <PageTitle>Index</PageTitle>
 
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-8">
+            <select @bind="roomSelected" class="form-control" id="Room" aria-describedby="NameHelp">
+                  
+                @if (rooms == null)
+                {
+                    <option value="">Loading...</option>
+                } 
+                else 
+                { 
+                    <option value="">Choose a room</option>
+                    foreach (Room room in rooms)
+                    {
+                        <option value="@room.Id">@room.Name</option>    
+                    }
+                }
+                
+            </select>
+        </div>
+    
+        <div class="col-4">
+            <button type="button" class="btn btn-primary" @onclick="GetStories">Load Stories</button>
+        </div>
+    </div>
 
+    <div class="row pt-3">
+        <div class="col-12">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th scope="col" class="col-1">Number</th>
+                        <th scope="col" style="width: 20px;"></th>
+                        <th scope="col">Short Description</th>
+                        <th scope="col" class="col-2">Vote</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (stories == null)
+                    {
+                        <tr>
+                            <td scope="row" colspan="4">
+                                <em>Choose a room to begin voting.</em>
+                            </td>
+                        </tr>
+                    }
+                    else
+                    {
+                        if (room != null)
+                        {
+                            @foreach (Story story in stories)
+                            {
+                                <StoryDetail SystemID="@story.Sys_id"
+                                             Number="@story.Number"
+                                             Description="@story.Description"
+                                             ShortDescription="@story.Short_description"
+                                             MyVote="@story.MyVote"
+                                             AllowPass="@room.AllowPass"
+                                             Product="@story.Product"
+                                             Priority="@story.Priority" />
+                            }
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+@code {
+    Room? room;
+    List<Room>? rooms;
+    List<Story>? stories;
+    public int roomSelected { get; set; }
+    public string? user { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        user = HttpContextAccessor.HttpContext?.User.Identity?.Name;
+        rooms = await _pokerDatabase.GetRooms();
+    }
+
+    private async Task GetStories()
+    {
+        List<Vote>? votes = null;
+        if (roomSelected > 0)
+        {
+            room = await _pokerDatabase.GetRoom(roomSelected);
+
+            if (room != null)
+            {
+                stories = await _serviceNowAPI.GetStories(room.Sprint, room.Filter);
+                if (user != null)
+                {
+                    votes = await _pokerDatabase.GetVotes(room.Sprint, user);
+                }   
+            }
+            
+            if (stories != null)
+            {
+                foreach (Story story in stories)
+                {
+                    story.MyVote = -3;
+                    if (votes != null)
+                    {
+                        var i = votes.FirstOrDefault(item => item.StoryId == story.Sys_id);
+                        if (i != null)
+                            story.MyVote = i.VoteValue;
+                    }
+                }
+            }
+        } else 
+        {
+            stories = null;
+        }
+    }
+}

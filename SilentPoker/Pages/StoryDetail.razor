@@ -1,0 +1,84 @@
+﻿@using SilentPoker.Models
+@using SilentPoker.Services
+
+
+@inject IConfiguration _config
+@inject PokerDatabase _pokerDatabase
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+
+<tr>
+    <th scope="row" class="align-top">
+        @Number
+    </th>
+
+    <td scope="row" class="align-top">
+        <button type="button" class="btn btn-link" data-bs-toggle="collapse" data-bs-target="#CP_@Number">
+            <i class="bi bi-caret-down-square-fill"></i>
+        </button>
+    </td>
+
+    <td>
+        @ShortDescription
+        <div id="CP_@Number" class="collapse">
+            <p class="text-muted">@Description</p>
+            <p class="text-secondary">
+                <i class="bi bi-gear-wide-connected"></i> <strong>@Product</strong>
+                <i class="bi bi-clock-history"></i> @Priority
+            </p>
+        
+            <div class="pt-3">
+                <button type="button" @onclick="@(e => Cast(-1, SystemID))" class="@VotingService.Vote(-1).VoteStyle">@VotingService.Vote(-1).VoteCard</button>
+                <button type="button" @onclick="@(e => Cast(0, SystemID))" class="@VotingService.Vote(0).VoteStyle">@VotingService.Vote(0).VoteCard</button>
+                <button type="button" @onclick="@(e => Cast(1, SystemID))" class="@VotingService.Vote(1).VoteStyle">@VotingService.Vote(1).VoteCard</button>
+                <button type="button" @onclick="@(e => Cast(2, SystemID))" class="@VotingService.Vote(2).VoteStyle">@VotingService.Vote(2).VoteCard</button>
+                <button type="button" @onclick="@(e => Cast(3, SystemID))" class="@VotingService.Vote(3).VoteStyle">@VotingService.Vote(3).VoteCard</button>
+                <button type="button" @onclick="@(e => Cast(5, SystemID))" class="@VotingService.Vote(5).VoteStyle">@VotingService.Vote(5).VoteCard</button>
+                <button type="button" @onclick="@(e => Cast(8, SystemID))" class="@VotingService.Vote(8).VoteStyle">@VotingService.Vote(8).VoteCard</button>
+                <button type="button" @onclick="@(e => Cast(13, SystemID))" class="@VotingService.Vote(13).VoteStyle">@VotingService.Vote(13).VoteCard</button>
+                <button type="button" @onclick="@(e => Cast(20, SystemID))" class="@VotingService.Vote(20).VoteStyle">@VotingService.Vote(20).VoteCard</button>
+                <button type="button" @onclick="@(e => Cast(40, SystemID))" class="@VotingService.Vote(40).VoteStyle">@VotingService.Vote(40).VoteCard</button>
+                @if (AllowPass)
+                {
+                    <span>
+                        <button type="button" @onclick="@(e => Cast(-2, SystemID))" class="@VotingService.Vote(-2).VoteStyle">@VotingService.Vote(-2).VoteCard</button>
+                    </span>
+                }
+            </div>
+        </div>
+    </td>
+    
+    <td>
+        <span class="@VotingService.Vote(MyVote).VoteStyle">
+            @VotingService.Vote(MyVote).VoteText
+        </span>
+    </td>
+
+</tr>
+
+
+@code {
+    
+    [Parameter]
+    public string? SystemID { get; set; }
+    [Parameter]
+    public string? Number { get; set; }
+    [Parameter]
+    public string? Description { get; set; }
+    [Parameter]
+    public string? ShortDescription { get; set; }
+    [Parameter]
+    public int MyVote { get; set; }
+    [Parameter]
+    public bool AllowPass { get; set; }
+    [Parameter]
+    public string? Product { get; set; }
+    [Parameter]
+    public string? Priority { get; set; }
+
+    private async Task Cast(int vote, string story)
+    {
+        var user = HttpContextAccessor.HttpContext?.User.Identity?.Name;
+        await _pokerDatabase.CastVote(vote, story, user);
+        MyVote = vote;
+    }
+}

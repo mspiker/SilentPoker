@@ -24,6 +24,22 @@ namespace SilentPoker.Services
                 _connectionString);
         }
 
+        public async Task CastVote(int vote, string storyId, string userId)
+        {
+            // Remove any existing votes for a story from the database
+            await _data.Execute(
+                "DELETE FROM Votes WHERE StoryId = @StoryId AND UserId = @UserId",
+                new { StoryId = storyId, UserId = userId },
+                _connectionString);
+
+            // Add a new vote to the database
+            await _data.Execute(
+                @"INSERT INTO Votes (VoteValue, StoryId, UserId) 
+                    VALUES (@VoteValue, @StoryId, @UserId);", 
+                new { VoteValue = vote, StoryId = storyId, UserId = userId }, 
+                _connectionString);
+        }
+
         public async Task<Room?> GetRoom(int id)
         {
             // Get a room from the database by id
@@ -32,6 +48,15 @@ namespace SilentPoker.Services
                 new { Id = id }, 
                 _connectionString);
             return rooms.FirstOrDefault();
+        }
+
+        public async Task<List<Vote>?> GetVotes(string StoryId, string UserId)
+        {
+            // Get all votes for a story from the database
+            return await _data.GetRecords<Vote, dynamic>(
+                @"SELECT * FROM Votes WHERE UserId = @UserId", 
+                new { StoryId, UserId }, 
+                _connectionString);
         }
 
         public async Task DeleteRoom(int id)
