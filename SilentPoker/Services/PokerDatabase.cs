@@ -29,6 +29,16 @@ namespace SilentPoker.Services
                 new { }, 
                 _connectionString);
         }
+
+        public async Task<Room?> GetRoom(int id)
+        {
+            // Get a room from the database by id
+            var rooms = await _data.GetRecords<Room, dynamic>(
+                @"SELECT * FROM Rooms WHERE Id = @Id", 
+                new { Id = id }, 
+                _connectionString);
+            return rooms.FirstOrDefault();
+        }
         
         public async Task AddRoom(Room room)
         {
@@ -38,6 +48,23 @@ namespace SilentPoker.Services
                     VALUES (@Name, @Sprint, @Filter, @AllowPass);", 
                 new
                 {
+                    Name = room.Name,
+                    Sprint = room.Sprint,
+                    Filter = room.Filter,
+                    AllowPass = room.AllowPass
+                }, 
+                _connectionString);
+        }
+
+        public async Task UpdateRoom(Room room)
+        {
+            // Update a room in the database
+            await _data.Execute(
+                @"UPDATE Rooms 
+                    SET Name = @Name, Sprint = @Sprint, Filter = @Filter, AllowPass = @AllowPass 
+                    WHERE Id = @Id;", 
+                new {
+                    Id = room.Id,
                     Name = room.Name,
                     Sprint = room.Sprint,
                     Filter = room.Filter,

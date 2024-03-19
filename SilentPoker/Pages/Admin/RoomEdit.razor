@@ -1,0 +1,99 @@
+﻿@page "/admin/roomedit/{id:int?}"
+
+@using SilentPoker.Models
+@using SilentPoker.Services
+
+@inject IConfiguration _config
+@inject PokerDatabase _pokerDatabase
+@inject NavigationManager NavigationManager
+
+<h3>Room</h3>
+
+@if (room == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <form>
+        <div class="mb-3">
+            <label for="Name" class="form-label">Name</label>
+            <input @bind="room.Name" type="text" class="form-control" id="Name" aria-describedby="NameHelp">
+        </div>
+        <div class="mb-3">
+            <label for="Sprint" class="form-label">Sprint</label>
+            <select @bind="room.Sprint" class="form-control" id="Sprint" aria-describedby="NameHelp">
+
+                @* @if (sprints == null)
+                {
+                    <option value="">Loading...</option>
+                }
+                else
+                {
+                    <option value="">Choose a sprint</option>
+                    foreach (SprintModel s in sprints)
+                    {
+                        <option value="@s.sys_id">@s.short_description</option>
+                    }
+                } *@
+
+            </select>
+        </div>
+        <div class="mb-3">
+            <label for="Filter" class="form-label">Filter</label>
+            <input @bind="room.Filter" type="text" class="form-control" id="Filter" aria-describedby="NameHelp">
+        </div>
+        <div class="mb-3">
+            <label for="AllowPass" class="form-label">Allow Pass</label>
+            <input @bind="room.AllowPass" type="checkbox" class="form-check-input" id="AllowPass" aria-describedby="NameHelp" />
+        </div>
+    </form>
+    <div>
+        @if (isAdd)
+        {
+            <button type="button" class="btn btn-primary" @onclick="InsertData">Save changes</button>
+        }
+        else
+        {
+            <button type="button" class="btn btn-primary" @onclick="UpdateData">Update changes</button>
+            @* <button type="button" class="btn btn-primary" @onclick="GetStories">Load Stories</button> *@
+        }
+    </div>
+}
+
+
+@code {
+    [Parameter]
+    public int? id { get; set; }
+
+    Room room;
+    bool isAdd;
+
+    private async Task InsertData()
+    {
+        await _pokerDatabase.AddRoom(room);
+        NavigationManager.NavigateTo("/Admin/Rooms");
+    }
+
+    public async Task UpdateData()
+    {
+        await _pokerDatabase.UpdateRoom(room);
+        NavigationManager.NavigateTo("/Admin/Rooms");
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (id.HasValue)
+        {
+            room = await _pokerDatabase.GetRoom(id.Value);
+            isAdd = false;
+        }
+        else
+        {
+            room = new Room();
+            isAdd = true;
+        }
+        //sprints = await _pokerDatabase.GetSprints();
+    }
+
+}
