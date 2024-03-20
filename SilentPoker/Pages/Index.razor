@@ -17,15 +17,20 @@
         <div class="col-12 mb-3">
             @if (room != null)
             {
+                
                 if (room.OpenVoting)
                 {
                     
                 }
                 else
                 {
-                    <div class="alert alert-danger" role="alert">
+                    <div class="alert alert-danger me-2" role="alert">
                         Voting is closed for this room.  Votes displayed are the voting results, hover over the vote to reveal who voted.
                     </div>
+                }
+                @foreach (var member in members)
+                {
+                    <span class="badge bg-secondary me-1">@member.UserId</span>
                 }
             }
         </div>
@@ -57,7 +62,15 @@
 
     <div class="col-12 mb-2 mt-1">
         @if (stories != null) {
-            <span class="text-muted me-1">This room contains @stories.Count stories.</span>
+            <span class="text-muted">This room contains @stories.Count stories </span>
+            @if(members == null)
+            {
+                <span class="text-muted me-1">and has no members assigned.</span>
+            } 
+            else
+            {
+                <span class="text-muted me-1">and has @members.Count members voting.</span>
+            }
             @if (room.Filter == "")
             {
             }
@@ -75,8 +88,8 @@
                     <tr>
                         <th scope="col" class="col-1">Number</th>
                         <th scope="col" class="col-1"></th>
-                        <th scope="col" class="col-8">Short Description</th>
-                        <th scope="col" class="col-2">Vote</th>
+                        <th scope="col" class="col-7">Short Description</th>
+                        <th scope="col" class="col-3">Vote</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -103,7 +116,8 @@
                                              Product="@story.Product"
                                              Priority="@story.Priority"
                                              OpenVoting="@room.OpenVoting"
-                                             Votes="@story.Votes"/>
+                                             Votes="@story.Votes"
+                                             Members="@members"/>
                             }
                         }
                     }
@@ -118,6 +132,7 @@
     Room? room;
     List<Room>? rooms;
     List<Story>? stories;
+    List<Member>? members;
     public int roomSelected { get; set; }
     public string? user { get; set; }
 
@@ -133,6 +148,7 @@
         if (roomSelected > 0)
         {
             room = await _pokerDatabase.GetRoom(roomSelected);
+            members = await _pokerDatabase.GetMembers(roomSelected);
 
             if (room != null)
             {

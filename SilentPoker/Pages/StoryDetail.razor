@@ -89,9 +89,15 @@
                     var total = Votes.Sum(v => v.VoteValue);
                     var average = total / Votes.Count;
                     var variance = Votes.Sum(v => Math.Pow(v.VoteValue - average, 2));
+                    
+                    // calculate participation and display as a decimal
+                    var participation = (Votes.Count * 1.0 / Members.Count * 1.0) ;
+                    
+                    
                     <div class="border-top mt-1">
                         <span class="badge bg-light text-dark">Var @variance</span>
                         <span class="badge bg-light text-dark">Avg @average</span>
+                        <span class="badge bg-light text-dark">Par @participation</span>
                     </div>
                 }
             }
@@ -121,6 +127,9 @@
     public string? Priority { get; set; }
     [Parameter]
     public bool OpenVoting { get; set; }
+
+    [Parameter]
+    public List<Member>? Members { get; set; }
 
     [Parameter]
     public List<Vote>? Votes { get; set; } 
