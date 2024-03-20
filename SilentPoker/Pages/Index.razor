@@ -3,6 +3,7 @@
 @using SilentPoker.Models
 @using SilentPoker.Services
 @using SilentPoker.Pages
+@using System.Text.RegularExpressions
 
 @inject IConfiguration _config
 @inject PokerDatabase _pokerDatabase
@@ -73,8 +74,8 @@
                 <thead>
                     <tr>
                         <th scope="col" class="col-1">Number</th>
-                        <th scope="col" style="width: 20px;"></th>
-                        <th scope="col">Short Description</th>
+                        <th scope="col" class="col-1"></th>
+                        <th scope="col" class="col-8">Short Description</th>
                         <th scope="col" class="col-2">Vote</th>
                     </tr>
                 </thead>
@@ -95,13 +96,14 @@
                             {
                                 <StoryDetail SystemID="@story.Sys_id"
                                              Number="@story.Number"
-                                             Description="@story.Description"
-                                             ShortDescription="@story.Short_description"
+                                             Description="@UIServices.TrimLongWords(story.Description, 18)"
+                                             ShortDescription="@UIServices.TrimLongWords(story.Short_description, 18)"
                                              MyVote="@story.MyVote"
                                              AllowPass="@room.AllowPass"
                                              Product="@story.Product"
                                              Priority="@story.Priority"
-                                             OpenVoting="@room.OpenVoting"/>
+                                             OpenVoting="@room.OpenVoting"
+                                             Votes="@story.Votes"/>
                             }
                         }
                     }
@@ -152,6 +154,7 @@
                         if (i != null)
                             story.MyVote = i.VoteValue;
                     }
+                    story.Votes = await _pokerDatabase.GetVotes(story.Sys_id);
                 }
             }
         } else 

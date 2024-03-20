@@ -10,13 +10,13 @@
         @Number
     </th>
 
-    <td scope="row" class="align-top">
+    <td scope="col" class="align-top">
         <button type="button" class="btn btn-link" data-bs-toggle="collapse" data-bs-target="#CP_@Number">
             <i class="bi bi-caret-down-square-fill"></i>
         </button>
     </td>
 
-    <td>
+    <td scope="col" class="align-top">
         @ShortDescription
         <div id="CP_@Number" class="collapse">
             <p class="text-muted">@Description</p>
@@ -47,12 +47,27 @@
             }
             else
             {
-                
+                @if (Votes == null)
+                {
+                }
+                else
+                {
+                    @foreach (Vote vote in Votes)
+                    {
+                        <span class="badge text-dark">
+                            @vote.UserId 
+                            <span class="@VotingService.Vote(vote.VoteValue).VoteStyle" data-bs-toggle="tooltip" title="@vote.UserId" style="cursor: pointer">
+                                @VotingService.Vote(vote.VoteValue).VoteCard
+                            </span>
+                        </span>
+                    }
+
+                }
             }
         </div>
     </td>
     
-    <td>
+    <td scope="col" class="align-top">
         @if (OpenVoting)
         {
             <span class="@VotingService.Vote(MyVote).VoteStyle">
@@ -61,25 +76,25 @@
         }
         else
         {
-            @foreach (Vote vote in Votes)
+            @if (Votes != null)
             {
-                <span class="@VotingService.Vote(vote.VoteValue).VoteStyle me-1" data-bs-toggle="tooltip" title="@vote.UserId" style="cursor: pointer">
-                    @VotingService.Vote(vote.VoteValue).VoteCard
-                </span>
-                @* <span>@vote.UserId </span> *@
-            }
-            <div>
-                @if (Votes != null)
+                @foreach (Vote vote in Votes)
                 {
-                    if (Votes.Count > 0)
-                    {
-                        var total = Votes.Sum(v => v.VoteValue);
-                        var average = total / Votes.Count;
-                        var variance = Votes.Sum(v => Math.Pow(v.VoteValue - average, 2));
-                        <span class="fs-6">Avg @average Var @variance</span>
-                    }
+                    <span class="@VotingService.Vote(vote.VoteValue).VoteStyle" data-bs-toggle="tooltip" title="@vote.UserId" style="cursor: pointer">
+                        @VotingService.Vote(vote.VoteValue).VoteCard
+                    </span>
                 }
-            </div>
+                if (Votes.Count > 0)
+                {
+                    var total = Votes.Sum(v => v.VoteValue);
+                    var average = total / Votes.Count;
+                    var variance = Votes.Sum(v => Math.Pow(v.VoteValue - average, 2));
+                    <div class="border-top mt-1">
+                        <span class="badge bg-light text-dark">Var @variance</span>
+                        <span class="badge bg-light text-dark">Avg @average</span>
+                    </div>
+                }
+            }
         }
     </td>
 
@@ -107,7 +122,9 @@
     [Parameter]
     public bool OpenVoting { get; set; }
 
-    List<Vote>? Votes = new List<Vote>();
+    [Parameter]
+    public List<Vote>? Votes { get; set; } 
+
 
     private async Task Cast(int vote, string story)
     {
@@ -116,7 +133,7 @@
         MyVote = vote;
     }
 
-    protected override async Task OnInitializedAsync()
+    @* protected override async Task OnInitializedAsync()
     {
         if (!OpenVoting)
         {
@@ -125,5 +142,5 @@
             }
 
         }
-    }
+    } *@
 }

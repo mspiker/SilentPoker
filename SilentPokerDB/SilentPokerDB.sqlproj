@@ -60,8 +60,12 @@
   <ItemGroup>
     <Build Include="Rooms.sql" />
     <Build Include="Votes.sql" />
+    <Build Include="Members.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="SilentPokerDB.publish.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <RefactorLog Include="SilentPokerDB.refactorlog" />
   </ItemGroup>
 </Project>

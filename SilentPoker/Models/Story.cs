@@ -10,5 +10,6 @@
         public string? Sys_id { get; set; }
         public int MyVote { get; set; }
         public string? Priority { get; set; }
+        public List<Vote>? Votes { get; set; }
     }
 }

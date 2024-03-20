@@ -68,6 +68,34 @@ namespace SilentPoker.Services
                 _connectionString);
         }
 
+        public async Task<List<Member>?> GetMembers(int RoomId)
+        {
+            // Get all members for a room from the database
+            return await _data.GetRecords<Member, dynamic>(
+                @"SELECT * FROM Members WHERE RoomId = @RoomId", 
+                new { RoomId }, 
+                _connectionString);
+        }
+
+        public async Task AddMember(Member member)
+        {
+            // Add a new member to the database
+            await _data.Execute(
+                @"INSERT INTO Members (RoomId, UserId, Role) 
+                    VALUES (@RoomId, @UserId, @Role);", 
+                new { member.RoomId, member.UserId, member.Role }, 
+                _connectionString);
+        }
+
+        public async Task DeleteMember(string userId, int roomId)
+        {
+            // Delete a member from the database
+            await _data.Execute(
+                @"DELETE FROM Members WHERE RoomId = @RoomId AND UserId = @UserId", 
+                new { roomId, userId }, 
+                _connectionString);
+        }
+
         public async Task DeleteRoom(int id)
         {
             // Delete a room from the database by id

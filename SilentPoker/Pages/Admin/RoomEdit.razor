@@ -47,14 +47,101 @@ else
         </div>
         <div class="mb-3">
             <label for="AllowPass" class="form-label">Allow Pass</label>
-            <input @bind="room.AllowPass" type="checkbox" class="form-check-input" id="AllowPass" aria-describedby="NameHelp" />
+            <input @bind="room.AllowPass" type="checkbox" class="form-check-input" id="AllowPass" aria-describedby="AllowPassHelp" />
+            <div id="AllowPassHelp" class="form-text">When selected, members can pass voting on stories.  Otherwise, they are required to choose a value.</div>
         </div>
         <div class="mb-3">
             <label for="OpenVoting" class="form-label">Open voting</label>
-            <input @bind="room.OpenVoting" type="checkbox" class="form-check-input" id="OpenVoting" aria-describedby="NameHelp" />
+            <input @bind="room.OpenVoting" type="checkbox" class="form-check-input" id="OpenVoting" aria-describedby="OpenVotingHelp" />
+            <div id="OpenVotingHelp" class="form-text">When selected, members can vote in the virtual room.  Unselect to close voting for this room.</div>
         </div>
+
+        @if (!isAdd)
+        {
+            
+            <div class="card mb-3">
+                <h5 class="card-header">
+                    Virtual Room Members
+                </h5>
+                <table class="table">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th scope="col" class="col-6">User</th>
+                            <th scope="col" class="col-4">Role</th>
+                            <th scope="col" class="col-2">Actions</th>
+                        </tr>
+                    </thead>
+                    
+                    <tbody>
+                        <tr>
+                            <td scope="row">
+                                <input @bind="member.UserId" type="text" class="form-control" id="UserId" aria-describedby="NameHelp">
+                            </td>
+                            <td scope="row">
+                                <select @bind="member.Role" class="form-control" id="Role" aria-describedby="NameHelp">
+                                    @foreach (var value in Enum.GetValues<MemberRole>())
+                                    {
+                                        int val = (int)value;
+                                        <option value="@value">@value</option>
+                                    }
+                                </select>
+                            </td>
+                            <td scope="row">
+                                <button type="button" class="btn btn-primary" @onclick="AddMember">Add</button>
+                            </td>
+                        </tr>
+
+                        @foreach (var member in members)
+                        {
+                            <tr>
+                                <td scope="row">@member.UserId</td>
+                                <td>
+                                    @if (member.Role == MemberRole.Observer)
+                                    {
+                                        <span class="badge bg-secondary">Observer</span>
+                                    }
+                                    else if (member.Role == MemberRole.ScrumMaster)
+                                    {
+                                        <span class="badge bg-primary">Scrum Master</span>
+                                    }
+                                    else if (member.Role == MemberRole.ProductOwner)
+                                    {
+                                        <span class="badge bg-success">Product Owner</span>
+                                    }
+                                    else if (member.Role == MemberRole.Developer)
+                                    {
+                                        <span class="badge bg-black">Developer</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-danger">!Unknown</span>
+                                    }
+                                </td>
+                                <td>
+                                    <button type="button" class="btn btn-danger" @onclick="@(e => DeleteMember(member.UserId))">Delete</button>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <div class="card mb-3">
+                <h5 class="card-header">
+                    Virtual Room Members
+                </h5>
+                <div class="card-body">
+                    <p class="card-text">You can add members to this room once you Save Changes.</p>
+                    
+                    
+                </div>
+            </div>
+        }
     </form>
     <div>
+        <hr class="mt-2 mb-3" />
         @if (isAdd)
         {
             <button type="button" class="btn btn-primary" @onclick="InsertData">Save changes</button>
@@ -74,6 +161,8 @@ else
 
     Room? room;
     List<Sprint>? sprints;
+    List<Member>? members;
+    Member member;
     bool isAdd;
 
     private async Task InsertData()
@@ -82,6 +171,47 @@ else
         {
             await _pokerDatabase.AddRoom(room);
             NavigationManager.NavigateTo("/Admin/Rooms");
+        }
+    }
+
+    public async Task AddMember()
+    {
+        if (member != null)
+        {
+            // Have we already added this member?
+            if (members.Any(m => m.UserId == member.UserId))
+            {
+                await JSRuntime.InvokeVoidAsync("alert", $"{member.UserId} is already a player in this room.");
+                return;
+            }
+
+            // Is the member blank?
+            if (string.IsNullOrWhiteSpace(member.UserId))
+            {
+                await JSRuntime.InvokeVoidAsync("alert", $"You can not add a blank member to this room.");
+                return;
+            }
+
+            
+            await _pokerDatabase.AddMember(member);
+            members = await _pokerDatabase.GetMembers(id.Value);
+            
+            // Reset the member
+            member = new Member()
+            {
+                UserId = "",
+                Role = MemberRole.Observer,
+                RoomId = id.Value
+            };
+        }
+    }
+
+    public async Task DeleteMember(string userId)
+    {
+        if (member != null)
+        {
+            await _pokerDatabase.DeleteMember(userId, room.Id);
+            members = await _pokerDatabase.GetMembers(id.Value);
         }
     }
 
@@ -109,9 +239,16 @@ else
 
     protected override async Task OnInitializedAsync()
     {
+        member= new Member()
+        {
+            UserId = "",
+            Role = MemberRole.Observer,
+            RoomId = id.Value
+        };
         if (id.HasValue)
         {
             room = await _pokerDatabase.GetRoom(id.Value);
+            members = await _pokerDatabase.GetMembers(id.Value);
             isAdd = false;
         }
         else

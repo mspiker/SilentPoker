@@ -25,7 +25,7 @@ namespace SilentPoker.Services
             var query = $"sprint={sprintId}";
             if (filter != string.Empty)
             {
-                _ = $"^{filter}";
+                query += $"^{filter}";
             }
             var result = await _endpointLibrary.CallAPI<Story>(
                 EndpointLibrary.Endpoint("rm_story", $"{query}", "number%2Cshort_description%2Csys_id%2Cproduct%2Cstory_points%2Cdescription%2Cpriority"));
