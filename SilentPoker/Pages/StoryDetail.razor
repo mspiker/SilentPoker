@@ -1,7 +1,6 @@
 ﻿@using SilentPoker.Models
 @using SilentPoker.Services
 
-
 @inject IConfiguration _config
 @inject PokerDatabase _pokerDatabase
 @inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
@@ -127,18 +126,4 @@
 
         }
     }
-    
-    // protected override async Task OnAfterRenderAsync(bool firstRender)
-    // {
-    //     if (!OpenVoting)
-    //     {
-    //         if (firstRender)
-    //         {
-    //             if (SystemID != null)
-    //                 Votes = await _pokerDatabase.GetVotes(SystemID);
-    //         }
-    //     }
-    // }
-
-
 }
