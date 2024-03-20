@@ -4,5 +4,6 @@
     [Name] VARCHAR(40) NOT NULL, 
     [Sprint] VARCHAR(32) NOT NULL, 
     [Filter] VARCHAR(256) NULL, 
-    [AllowPass] BIT NULL
+    [AllowPass] BIT NULL, 
+    [OpenVoting] BIT NULL
 )

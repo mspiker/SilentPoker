@@ -59,6 +59,15 @@ namespace SilentPoker.Services
                 _connectionString);
         }
 
+        public async Task<List<Vote>?> GetVotes(string StoryId)
+        {
+            // Get all votes for a story from the database
+            return await _data.GetRecords<Vote, dynamic>(
+                @"SELECT * FROM Votes WHERE StoryId = @StoryId ORDER BY VoteValue ASC", 
+                new { StoryId }, 
+                _connectionString);
+        }
+
         public async Task DeleteRoom(int id)
         {
             // Delete a room from the database by id
@@ -72,14 +81,15 @@ namespace SilentPoker.Services
         {
             // Add a new room to the database
             await _data.Execute(
-                @"INSERT INTO Rooms (Name, Sprint, Filter, AllowPass) 
-                    VALUES (@Name, @Sprint, @Filter, @AllowPass);", 
+                @"INSERT INTO Rooms (Name, Sprint, Filter, AllowPass, OpenVoting) 
+                    VALUES (@Name, @Sprint, @Filter, @AllowPass, @OpenVoting);", 
                 new
                 {
                     room.Name,
                     room.Sprint,
                     room.Filter,
-                    room.AllowPass
+                    room.AllowPass,
+                    room.OpenVoting
                 }, 
                 _connectionString);
         }
@@ -89,14 +99,15 @@ namespace SilentPoker.Services
             // Update a room in the database
             await _data.Execute(
                 @"UPDATE Rooms 
-                    SET Name = @Name, Sprint = @Sprint, Filter = @Filter, AllowPass = @AllowPass 
+                    SET Name = @Name, Sprint = @Sprint, Filter = @Filter, AllowPass = @AllowPass, OpenVoting = @OpenVoting 
                     WHERE Id = @Id;", 
                 new {
                     room.Id,
                     room.Name,
                     room.Sprint,
                     room.Filter,
-                    room.AllowPass
+                    room.AllowPass,
+                    room.OpenVoting
                 }, 
                 _connectionString);
         }

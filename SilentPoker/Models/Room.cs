@@ -7,6 +7,7 @@
         public string Sprint { get; set; } = "";
         public string Filter { get; set; } = "";
         public bool AllowPass { get; set; }
+        public bool OpenVoting { get; set; }
 
     }
 }

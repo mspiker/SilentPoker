@@ -49,6 +49,10 @@ else
             <label for="AllowPass" class="form-label">Allow Pass</label>
             <input @bind="room.AllowPass" type="checkbox" class="form-check-input" id="AllowPass" aria-describedby="NameHelp" />
         </div>
+        <div class="mb-3">
+            <label for="OpenVoting" class="form-label">Open voting</label>
+            <input @bind="room.OpenVoting" type="checkbox" class="form-check-input" id="OpenVoting" aria-describedby="NameHelp" />
+        </div>
     </form>
     <div>
         @if (isAdd)

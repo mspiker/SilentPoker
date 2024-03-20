@@ -13,7 +13,24 @@
 
 <div class="container-fluid">
     <div class="row">
+        <div class="col-12 mb-3">
+            @if (room != null)
+            {
+                if (room.OpenVoting)
+                {
+                    
+                }
+                else
+                {
+                    <div class="alert alert-danger" role="alert">
+                        Voting is closed for this room.  Votes displayed are the voting results, hover over the vote to reveal who voted.
+                    </div>
+                }
+            }
+        </div>
         <div class="col-8">
+            
+            
             <select @bind="roomSelected" class="form-control" id="Room" aria-describedby="NameHelp">
                   
                 @if (rooms == null)
@@ -35,6 +52,19 @@
         <div class="col-4">
             <button type="button" class="btn btn-primary" @onclick="GetStories">Load Stories</button>
         </div>
+    </div>
+
+    <div class="col-12 mb-2 mt-1">
+        @if (stories != null) {
+            <span class="text-muted me-1">This room contains @stories.Count stories.</span>
+            @if (room.Filter == "")
+            {
+            }
+            else
+            {
+                <span class="text-muted">This filter is applied: <strong>@room.Filter.</strong></span>
+            }
+        }
     </div>
 
     <div class="row pt-3">
@@ -70,7 +100,8 @@
                                              MyVote="@story.MyVote"
                                              AllowPass="@room.AllowPass"
                                              Product="@story.Product"
-                                             Priority="@story.Priority" />
+                                             Priority="@story.Priority"
+                                             OpenVoting="@room.OpenVoting"/>
                             }
                         }
                     }

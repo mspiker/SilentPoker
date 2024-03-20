@@ -26,38 +26,69 @@
                 <i class="bi bi-clock-history"></i> @Priority
             </p>
         
-            <div class="pt-3">
-                <button type="button" @onclick="@(e => Cast(-1, SystemID))" class="@VotingService.Vote(-1).VoteStyle">@VotingService.Vote(-1).VoteCard</button>
-                <button type="button" @onclick="@(e => Cast(0, SystemID))" class="@VotingService.Vote(0).VoteStyle">@VotingService.Vote(0).VoteCard</button>
-                <button type="button" @onclick="@(e => Cast(1, SystemID))" class="@VotingService.Vote(1).VoteStyle">@VotingService.Vote(1).VoteCard</button>
-                <button type="button" @onclick="@(e => Cast(2, SystemID))" class="@VotingService.Vote(2).VoteStyle">@VotingService.Vote(2).VoteCard</button>
-                <button type="button" @onclick="@(e => Cast(3, SystemID))" class="@VotingService.Vote(3).VoteStyle">@VotingService.Vote(3).VoteCard</button>
-                <button type="button" @onclick="@(e => Cast(5, SystemID))" class="@VotingService.Vote(5).VoteStyle">@VotingService.Vote(5).VoteCard</button>
-                <button type="button" @onclick="@(e => Cast(8, SystemID))" class="@VotingService.Vote(8).VoteStyle">@VotingService.Vote(8).VoteCard</button>
-                <button type="button" @onclick="@(e => Cast(13, SystemID))" class="@VotingService.Vote(13).VoteStyle">@VotingService.Vote(13).VoteCard</button>
-                <button type="button" @onclick="@(e => Cast(20, SystemID))" class="@VotingService.Vote(20).VoteStyle">@VotingService.Vote(20).VoteCard</button>
-                <button type="button" @onclick="@(e => Cast(40, SystemID))" class="@VotingService.Vote(40).VoteStyle">@VotingService.Vote(40).VoteCard</button>
-                @if (AllowPass)
-                {
-                    <span>
-                        <button type="button" @onclick="@(e => Cast(-2, SystemID))" class="@VotingService.Vote(-2).VoteStyle">@VotingService.Vote(-2).VoteCard</button>
-                    </span>
-                }
-            </div>
+            @if (OpenVoting && SystemID != null) {
+                <div class="pt-3">
+                    <button type="button" @onclick="@(e => Cast(-1, SystemID))" class="me-1 @VotingService.Vote(-1).VoteStyle">@VotingService.Vote(-1).VoteCard</button>
+                    <button type="button" @onclick="@(e => Cast(0, SystemID))" class="me-1 @VotingService.Vote(0).VoteStyle">@VotingService.Vote(0).VoteCard</button>
+                    <button type="button" @onclick="@(e => Cast(1, SystemID))" class="me-1 @VotingService.Vote(1).VoteStyle">@VotingService.Vote(1).VoteCard</button>
+                    <button type="button" @onclick="@(e => Cast(2, SystemID))" class="me-1 @VotingService.Vote(2).VoteStyle">@VotingService.Vote(2).VoteCard</button>
+                    <button type="button" @onclick="@(e => Cast(3, SystemID))" class="me-1 @VotingService.Vote(3).VoteStyle">@VotingService.Vote(3).VoteCard</button>
+                    <button type="button" @onclick="@(e => Cast(5, SystemID))" class="me-1 @VotingService.Vote(5).VoteStyle">@VotingService.Vote(5).VoteCard</button>
+                    <button type="button" @onclick="@(e => Cast(8, SystemID))" class="me-1 @VotingService.Vote(8).VoteStyle">@VotingService.Vote(8).VoteCard</button>
+                    <button type="button" @onclick="@(e => Cast(13, SystemID))" class="me-1 @VotingService.Vote(13).VoteStyle">@VotingService.Vote(13).VoteCard</button>
+                    <button type="button" @onclick="@(e => Cast(20, SystemID))" class="me-1 @VotingService.Vote(20).VoteStyle">@VotingService.Vote(20).VoteCard</button>
+                    <button type="button" @onclick="@(e => Cast(40, SystemID))" class="me-1 @VotingService.Vote(40).VoteStyle">@VotingService.Vote(40).VoteCard</button>
+                    @if (AllowPass)
+                    {
+                        <span>
+                            <button type="button" @onclick="@(e => Cast(-2, SystemID))" class="me-1 @VotingService.Vote(-2).VoteStyle">@VotingService.Vote(-2).VoteCard</button>
+                        </span>
+                    }
+                </div>
+            }
+            else
+            {
+                
+            }
         </div>
     </td>
     
     <td>
-        <span class="@VotingService.Vote(MyVote).VoteStyle">
-            @VotingService.Vote(MyVote).VoteText
-        </span>
+        @if (OpenVoting)
+        {
+            <span class="@VotingService.Vote(MyVote).VoteStyle">
+                @VotingService.Vote(MyVote).VoteText
+            </span>
+        }
+        else
+        {
+            @foreach (Vote vote in Votes)
+            {
+                <span class="@VotingService.Vote(vote.VoteValue).VoteStyle me-1" data-bs-toggle="tooltip" title="@vote.UserId" style="cursor: pointer">
+                    @VotingService.Vote(vote.VoteValue).VoteCard
+                </span>
+                @* <span>@vote.UserId </span> *@
+            }
+            <div>
+                @if (Votes != null)
+                {
+                    if (Votes.Count > 0)
+                    {
+                        var total = Votes.Sum(v => v.VoteValue);
+                        var average = total / Votes.Count;
+                        var variance = Votes.Sum(v => Math.Pow(v.VoteValue - average, 2));
+                        <span class="fs-6">Avg @average Var @variance</span>
+                    }
+                }
+            </div>
+        }
     </td>
 
 </tr>
 
 
 @code {
-    
+
     [Parameter]
     public string? SystemID { get; set; }
     [Parameter]
@@ -74,6 +105,10 @@
     public string? Product { get; set; }
     [Parameter]
     public string? Priority { get; set; }
+    [Parameter]
+    public bool OpenVoting { get; set; }
+
+    List<Vote>? Votes = new List<Vote>();
 
     private async Task Cast(int vote, string story)
     {
@@ -81,4 +116,29 @@
         await _pokerDatabase.CastVote(vote, story, user);
         MyVote = vote;
     }
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!OpenVoting)
+        {
+            if (SystemID != null) {
+                Votes = await _pokerDatabase.GetVotes(SystemID);
+            }
+
+        }
+    }
+    
+    // protected override async Task OnAfterRenderAsync(bool firstRender)
+    // {
+    //     if (!OpenVoting)
+    //     {
+    //         if (firstRender)
+    //         {
+    //             if (SystemID != null)
+    //                 Votes = await _pokerDatabase.GetVotes(SystemID);
+    //         }
+    //     }
+    // }
+
+
 }
