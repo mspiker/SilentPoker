@@ -14,35 +14,33 @@
                 
                 <form>
                     <label for="Knowledge" class="form-label">Knowledge of the work</label>
-                    <input type="range" class="form-range" min="0" max="9" @bind="f1" id="Knowledge" aria-describedby="KnowledgeHelpBlock">
+                    <input type="range" class="form-range" min="1" max="10" @bind="f1" id="Knowledge" aria-describedby="KnowledgeHelpBlock">
                     <div id="KnowledgeHelpBlock" class="form-text mb-3">
                         How familiar are you with the work that would be required in this story?  
                     </div>
 
                     <label for="Dependencies" class="form-label">Dependencies</label>
-                    <input type="range" class="form-range" min="0" max="9" @bind="f2" id="Dependencies" aria-describedby="DependenciesHelpBlock">
+                    <input type="range" class="form-range" min="1" max="10" @bind="f2" id="Dependencies" aria-describedby="DependenciesHelpBlock">
                     <div id="DependenciesHelpBlock" class="form-text mb-3">
                         How dependent would the person assigned the story be on others to complete their work?
                     </div>
 
                     <label for="WorkEffort" class="form-label">Relative Work Effort</label>
-                    <input type="range" class="form-range" min="0" max="9" @bind="f3" id="WorkEffort" aria-describedby="WorkEffortHelpBlock">
+                    <input type="range" class="form-range" min="1" max="10" @bind="f3" id="WorkEffort" aria-describedby="WorkEffortHelpBlock">
                     <div id="WorkEffortHelpBlock" class="form-text mb-3">
                         How dependent would the person assigned the story be on others to complete their work?
                     </div>
 
                     <label for="StoryQuality" class="form-label">Completeness of Requirements</label>
-                    <input type="range" class="form-range" min="0" max="9" @bind="f4" id="StoryQuality" aria-describedby="StoryQualityHelpBlock">
+                    <input type="range" class="form-range" min="1" max="10" @bind="f4" id="StoryQuality" aria-describedby="StoryQualityHelpBlock">
                     <div id="StoryQualityHelpBlock" class="form-text">
                         How complete are the story requirements?  Are there any unknowns? Are there any assumptions?
                     </div>
                 </form>
 
-                <p>Score: @v()</p>
+                <p>Score: @Score()</p>
             </div>
             <div class="modal-footer">
-
-                <button type="button" class="btn btn-primary" @onclick="Calculate">Calculate</button>
                 <button type="button" class="btn btn-secondary" @onclick="Close">Close</button>
             </div>
         </div>
@@ -63,22 +61,29 @@
     // Create a property to calculate the score
     public int score = 0;
 
-    public int v()
+    public int Score()
     {
-        return f1 * f2 * f3 * f4;
-    }
+        int f1s = f1 - 5;
+        int f2s = f2 - 5;
+        int f3s = f3 - 5;
+        int f4s = f4 - 5;
 
-    public void Calculate()
-    {
-        score = f1 * f2 * f3 * f4;
-        //StateHasChanged();
-    }
+        // sum the scores
+        score = f1s + f2s + f3s + f4s;
 
+        return score;
+    }
+    
     //public void Show(string bodyText, string headerText = "")
     public void Show()
     {
         //HeaderText = headerText;
         //BodyText = bodyText;
+        f1 = 5;
+        f2 = 5;
+        f3 = 5;
+        f4 = 5;
+
         IsVisible = true;
         StateHasChanged();
     }
