@@ -2,7 +2,6 @@
 
 @using SilentPoker.Models
 @using SilentPoker.Services
-@* @using SilentPoker.Pages *@
 @using System.Text.RegularExpressions
 
 @inject IConfiguration _config
@@ -57,7 +56,9 @@
     
         <div class="col-4">
             <button type="button" class="btn btn-primary" @onclick="GetStories">Load Stories</button>
-            <button type="button" class="me-0 rounded-pill" @onclick="RedirectPage">Estimator</button>
+            <button type="button" class="me-0 rounded-pill" @onclick="ShowEstimator">
+                <i class="bi bi-calculator-fill"></i> Estimator
+            </button>
         </div>
     </div>
 
@@ -82,7 +83,7 @@
         }
     </div>
 
-    <div class="row pt-3">
+    <div class="row pt-3 flex">
         <div class="col-12">
             <table class="table table-striped">
                 <thead>
@@ -129,7 +130,7 @@
 
 </div>
 
-<Estimator @ref="popupRef" />
+<Estimator @ref="estimatorModal" />
 
 @code {
     Room? room;
@@ -139,12 +140,11 @@
     public int roomSelected { get; set; }
     public string? user { get; set; }
 
-    private Estimator popupRef;
+    private Estimator estimatorModal;
 
-    private void RedirectPage()
+    private void ShowEstimator()
     {
-        // Shows the popup at the center of the screen
-        popupRef.Show("Popup body text");
+        estimatorModal.Show();
     }
 
     protected override async Task OnInitializedAsync()
@@ -156,6 +156,7 @@
     private async Task GetStories()
     {
         List<Vote>? votes = null;
+
         if (roomSelected > 0)
         {
             room = await _pokerDatabase.GetRoom(roomSelected);

@@ -91,7 +91,7 @@ else
                             </td>
                         </tr>
 
-                        @foreach (var member in members)
+                        @foreach (var member in room.Members)
                         {
                             <tr>
                                 <td scope="row">@member.UserId</td>
@@ -159,11 +159,11 @@ else
     [Parameter]
     public int? id { get; set; }
 
-    Room? room;
-    List<Sprint>? sprints;
-    List<Member>? members;
-    Member member;
     bool isAdd;
+    Room? room;
+    Member member;
+
+    List<Sprint>? sprints;
 
     private async Task InsertData()
     {
@@ -178,8 +178,8 @@ else
     {
         if (member != null)
         {
-            // Have we already added this member?
-            if (members.Any(m => m.UserId == member.UserId))
+            // *1 Have we already added this member?
+            if (room.Members.Any(m => m.UserId == member.UserId))
             {
                 await JSRuntime.InvokeVoidAsync("alert", $"{member.UserId} is already a player in this room.");
                 return;
@@ -194,8 +194,9 @@ else
 
             
             await _pokerDatabase.AddMember(member);
-            members = await _pokerDatabase.GetMembers(id.Value);
-            
+            room = await _pokerDatabase.GetRoom(room.Id);
+
+
             // Reset the member
             member = new Member()
             {
@@ -211,7 +212,7 @@ else
         if (member != null)
         {
             await _pokerDatabase.DeleteMember(userId, room.Id);
-            members = await _pokerDatabase.GetMembers(id.Value);
+            room = await _pokerDatabase.GetRoom(room.Id);
         }
     }
 
@@ -239,16 +240,16 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        member= new Member()
-        {
-            UserId = "",
-            Role = MemberRole.Observer,
-            RoomId = id.Value
-        };
+        
         if (id.HasValue)
         {
+            member = new Member()
+            {
+                UserId = "",
+                Role = MemberRole.Observer,
+                RoomId = id.Value
+            };
             room = await _pokerDatabase.GetRoom(id.Value);
-            members = await _pokerDatabase.GetMembers(id.Value);
             isAdd = false;
         }
         else

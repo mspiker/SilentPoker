@@ -59,11 +59,14 @@ namespace SilentPoker.Services
         public async Task<Room?> GetRoom(int id)
         {
             // Get a room from the database by id
+            List<Member>? members = await GetMembers(id);
             var rooms = await _data.GetRecords<Room, dynamic>(
                 @"SELECT * FROM Rooms WHERE Id = @Id", 
                 new { Id = id }, 
                 _connectionString);
-            return rooms.FirstOrDefault();
+            var room = rooms.FirstOrDefault();
+            room.Members = members ?? new List<Member>();
+            return room;
         }
 
         /// <summary>

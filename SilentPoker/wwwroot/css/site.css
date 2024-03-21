@@ -8,6 +8,19 @@ html, body {
     font-style: normal;
 }
 
+.modal-backdrop {
+    --bs-backdrop-zindex: 1050;
+    --bs-backdrop-bg: #000;
+    --bs-backdrop-opacity: 0.5;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: var(--bs-backdrop-zindex);
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 125, 0.25);
+}
+
 h1:focus {
     outline: none;
 }

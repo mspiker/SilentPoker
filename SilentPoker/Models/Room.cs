@@ -8,6 +8,7 @@
         public string Filter { get; set; } = "";
         public bool AllowPass { get; set; }
         public bool OpenVoting { get; set; }
+        public List<Member> Members { get; set; } = new List<Member>();
 
     }
 }
