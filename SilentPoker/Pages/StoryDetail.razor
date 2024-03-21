@@ -21,21 +21,24 @@
         <div id="CP_@Number" class="collapse">
             <p class="text-muted">@Description</p>
             <p class="text-secondary">
-                <i class="bi bi-gear-wide-connected"></i> <strong>@Product</strong>
-                <i class="bi bi-clock-history"></i> @Priority
+                <span class="me-2"><i class="bi bi-gear-wide-connected"></i> <strong>@Product</strong></span>
+                <span><i class="bi bi-clock-history"></i> @Priority</span>
             </p>
         
             @if (OpenVoting && SystemID != null) {
-                <div class="pt-3">
-                    <button type="button" @onclick="@(e => Cast(-1, SystemID))" class="me-1 @VotingService.Vote(-1).VoteStyle">@VotingService.Vote(-1).VoteCard</button>
-                    <button type="button" @onclick="@(e => Cast(0, SystemID))" class="me-1 @VotingService.Vote(0).VoteStyle">@VotingService.Vote(0).VoteCard</button>
-                    <button type="button" @onclick="@(e => Cast(1, SystemID))" class="me-1 @VotingService.Vote(1).VoteStyle">@VotingService.Vote(1).VoteCard</button>
-                    <button type="button" @onclick="@(e => Cast(2, SystemID))" class="me-1 @VotingService.Vote(2).VoteStyle">@VotingService.Vote(2).VoteCard</button>
-                    <button type="button" @onclick="@(e => Cast(3, SystemID))" class="me-1 @VotingService.Vote(3).VoteStyle">@VotingService.Vote(3).VoteCard</button>
-                    <button type="button" @onclick="@(e => Cast(5, SystemID))" class="me-1 @VotingService.Vote(5).VoteStyle">@VotingService.Vote(5).VoteCard</button>
-                    <button type="button" @onclick="@(e => Cast(8, SystemID))" class="me-1 @VotingService.Vote(8).VoteStyle">@VotingService.Vote(8).VoteCard</button>
-                    <button type="button" @onclick="@(e => Cast(13, SystemID))" class="me-1 @VotingService.Vote(13).VoteStyle">@VotingService.Vote(13).VoteCard</button>
-                    <button type="button" @onclick="@(e => Cast(20, SystemID))" class="me-1 @VotingService.Vote(20).VoteStyle">@VotingService.Vote(20).VoteCard</button>
+                <div class="p-3 pt-1 border border-4">
+                    <p class="fs-5 m-0">Vote</p>
+                    <p class="fs-6 text-muted">Select your vote from the options below. The Estimator will help you decide the story points to select.</p>
+
+                    <button type="button" @onclick="@(e => Cast(-1, SystemID))" class="me-0 @VotingService.Vote(-1).VoteStyle">@VotingService.Vote(-1).VoteCard</button>
+                    <button type="button" @onclick="@(e => Cast(0, SystemID))" class="me-0 @VotingService.Vote(0).VoteStyle">@VotingService.Vote(0).VoteCard</button>
+                    <button type="button" @onclick="@(e => Cast(1, SystemID))" class="me-0 @VotingService.Vote(1).VoteStyle">@VotingService.Vote(1).VoteCard</button>
+                    <button type="button" @onclick="@(e => Cast(2, SystemID))" class="me-0 @VotingService.Vote(2).VoteStyle">@VotingService.Vote(2).VoteCard</button>
+                    <button type="button" @onclick="@(e => Cast(3, SystemID))" class="me-0 @VotingService.Vote(3).VoteStyle">@VotingService.Vote(3).VoteCard</button>
+                    <button type="button" @onclick="@(e => Cast(5, SystemID))" class="me-0 @VotingService.Vote(5).VoteStyle">@VotingService.Vote(5).VoteCard</button>
+                    <button type="button" @onclick="@(e => Cast(8, SystemID))" class="me-0 @VotingService.Vote(8).VoteStyle">@VotingService.Vote(8).VoteCard</button>
+                    <button type="button" @onclick="@(e => Cast(13, SystemID))" class="me-0 @VotingService.Vote(13).VoteStyle">@VotingService.Vote(13).VoteCard</button>
+                    <button type="button" @onclick="@(e => Cast(20, SystemID))" class="me-0 @VotingService.Vote(20).VoteStyle">@VotingService.Vote(20).VoteCard</button>
                     <button type="button" @onclick="@(e => Cast(40, SystemID))" class="me-1 @VotingService.Vote(40).VoteStyle">@VotingService.Vote(40).VoteCard</button>
                     @if (AllowPass)
                     {
@@ -43,6 +46,7 @@
                             <button type="button" @onclick="@(e => Cast(-2, SystemID))" class="me-1 @VotingService.Vote(-2).VoteStyle">@VotingService.Vote(-2).VoteCard</button>
                         </span>
                     }
+                    
                 </div>
             }
             else
@@ -93,11 +97,16 @@
                     // calculate participation and display as a decimal
                     var participation = (Votes.Count * 1.0 / Members.Count * 1.0) ;
                     
-                    
                     <div class="border-top mt-1">
-                        <span class="badge bg-light text-dark">Var @variance</span>
-                        <span class="badge bg-light text-dark">Avg @average</span>
-                        <span class="badge bg-light text-dark">Par @participation</span>
+                        <span class="badge bg-light text-dark" data-bs-toggle="tooltip" title="Variance, lower numbers indicate team agreement" style="cursor: pointer">
+                            Var @String.Format("{0:0.0}", variance)
+                        </span>
+                        <span class="badge bg-light text-dark" data-bs-toggle="tooltip" title="Average, the average of all votes" style="cursor: pointer">
+                            Avg @average
+                        </span>
+                        <span class="badge bg-light text-dark" data-bs-toggle="tooltip" title="Participation, percent of team casting a vote" style="cursor: pointer">
+                            Par @String.Format("{0:0.0}", participation)
+                        </span>
                     </div>
                 }
             }
@@ -105,6 +114,7 @@
     </td>
 
 </tr>
+
 
 
 @code {
@@ -127,10 +137,8 @@
     public string? Priority { get; set; }
     [Parameter]
     public bool OpenVoting { get; set; }
-
     [Parameter]
     public List<Member>? Members { get; set; }
-
     [Parameter]
     public List<Vote>? Votes { get; set; } 
 
@@ -141,15 +149,4 @@
         await _pokerDatabase.CastVote(vote, story, user);
         MyVote = vote;
     }
-
-    @* protected override async Task OnInitializedAsync()
-    {
-        if (!OpenVoting)
-        {
-            if (SystemID != null) {
-                Votes = await _pokerDatabase.GetVotes(SystemID);
-            }
-
-        }
-    } *@
 }

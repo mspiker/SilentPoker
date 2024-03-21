@@ -15,6 +15,10 @@ namespace SilentPoker.Services
             _connectionString = connectionString;
         }
         
+        /// <summary>
+        /// Get a list of all rooms from the database
+        /// </summary>
+        /// <returns>List of rooms</returns>
         public async Task<List<Room>> GetRooms()
         {
             // Get all rooms from the database
@@ -24,6 +28,13 @@ namespace SilentPoker.Services
                 _connectionString);
         }
 
+        /// <summary>
+        /// Cast a vote for a story in a room
+        /// </summary>
+        /// <param name="vote">The value of the vote</param>
+        /// <param name="storyId">The Id of the story</param>
+        /// <param name="userId">The user Id casting the vote</param>
+        /// <returns></returns>
         public async Task CastVote(int vote, string storyId, string userId)
         {
             // Remove any existing votes for a story from the database
@@ -40,6 +51,11 @@ namespace SilentPoker.Services
                 _connectionString);
         }
 
+        /// <summary>
+        /// Get a room from the database by id
+        /// </summary>
+        /// <param name="id">Room Id to get</param>
+        /// <returns>Room retrieved</returns>
         public async Task<Room?> GetRoom(int id)
         {
             // Get a room from the database by id
@@ -50,16 +66,26 @@ namespace SilentPoker.Services
             return rooms.FirstOrDefault();
         }
 
-        public async Task<List<Vote>?> GetVotes(string StoryId, string UserId)
+        /// <summary>
+        /// Get all the votes for a user from the database
+        /// </summary>
+        /// <param name="UserId">The user you want the vote for</param>
+        /// <returns></returns>
+        public async Task<List<Vote>?> GetVotesForUser(string UserId)
         {
             // Get all votes for a story from the database
             return await _data.GetRecords<Vote, dynamic>(
                 @"SELECT * FROM Votes WHERE UserId = @UserId", 
-                new { StoryId, UserId }, 
+                new { UserId }, 
                 _connectionString);
         }
 
-        public async Task<List<Vote>?> GetVotes(string StoryId)
+        /// <summary>
+        /// Get all the votes for a story from the database
+        /// </summary>
+        /// <param name="StoryId">The Story Id</param>
+        /// <returns></returns>
+        public async Task<List<Vote>?> GetVotesForStory(string StoryId)
         {
             // Get all votes for a story from the database
             return await _data.GetRecords<Vote, dynamic>(
@@ -68,6 +94,11 @@ namespace SilentPoker.Services
                 _connectionString);
         }
 
+        /// <summary>
+        /// Get all the members for a room from the database
+        /// </summary>
+        /// <param name="RoomId">The Room Id</param>
+        /// <returns></returns>
         public async Task<List<Member>?> GetMembers(int RoomId)
         {
             // Get all members for a room from the database
@@ -77,6 +108,11 @@ namespace SilentPoker.Services
                 _connectionString);
         }
 
+        /// <summary>
+        /// Add a member to a room
+        /// </summary>
+        /// <param name="member">The member to add the the room</param>
+        /// <returns></returns>
         public async Task AddMember(Member member)
         {
             // Add a new member to the database
@@ -87,6 +123,12 @@ namespace SilentPoker.Services
                 _connectionString);
         }
 
+        /// <summary>
+        /// Delete a member from a room
+        /// </summary>
+        /// <param name="userId">The User Id to be removed</param>
+        /// <param name="roomId">The Room Id to have the member removed from</param>
+        /// <returns></returns>
         public async Task DeleteMember(string userId, int roomId)
         {
             // Delete a member from the database
@@ -96,6 +138,11 @@ namespace SilentPoker.Services
                 _connectionString);
         }
 
+        /// <summary>
+        /// Delete a room from the database by id
+        /// </summary>
+        /// <param name="id">The Id of the room to remove</param>
+        /// <returns></returns>
         public async Task DeleteRoom(int id)
         {
             // Delete a room from the database by id
@@ -105,6 +152,11 @@ namespace SilentPoker.Services
                 _connectionString);
         }
         
+        /// <summary>
+        /// Add a room to the database
+        /// </summary>
+        /// <param name="room">Room to add</param>
+        /// <returns></returns>
         public async Task AddRoom(Room room)
         {
             // Add a new room to the database
@@ -122,6 +174,11 @@ namespace SilentPoker.Services
                 _connectionString);
         }
 
+        /// <summary>
+        /// Update a room in the database
+        /// </summary>
+        /// <param name="room">The room to update</param>
+        /// <returns></returns>
         public async Task UpdateRoom(Room room)
         {
             // Update a room in the database

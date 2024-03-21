@@ -2,7 +2,7 @@
 
 @using SilentPoker.Models
 @using SilentPoker.Services
-@using SilentPoker.Pages
+@* @using SilentPoker.Pages *@
 @using System.Text.RegularExpressions
 
 @inject IConfiguration _config
@@ -57,6 +57,7 @@
     
         <div class="col-4">
             <button type="button" class="btn btn-primary" @onclick="GetStories">Load Stories</button>
+            <button type="button" class="me-0 rounded-pill" @onclick="RedirectPage">Estimator</button>
         </div>
     </div>
 
@@ -128,6 +129,8 @@
 
 </div>
 
+<Estimator @ref="popupRef" />
+
 @code {
     Room? room;
     List<Room>? rooms;
@@ -135,6 +138,14 @@
     List<Member>? members;
     public int roomSelected { get; set; }
     public string? user { get; set; }
+
+    private Estimator popupRef;
+
+    private void RedirectPage()
+    {
+        // Shows the popup at the center of the screen
+        popupRef.Show("Popup body text");
+    }
 
     protected override async Task OnInitializedAsync()
     {
@@ -155,7 +166,7 @@
                 stories = await _serviceNowAPI.GetStories(room.Sprint, room.Filter);
                 if (user != null)
                 {
-                    votes = await _pokerDatabase.GetVotes(room.Sprint, user);
+                    votes = await _pokerDatabase.GetVotesForUser(user);
                 }   
             }
             
@@ -170,7 +181,7 @@
                         if (i != null)
                             story.MyVote = i.VoteValue;
                     }
-                    story.Votes = await _pokerDatabase.GetVotes(story.Sys_id);
+                    story.Votes = await _pokerDatabase.GetVotesForStory(story.Sys_id);
                 }
             }
         } else 
