@@ -258,6 +258,9 @@ else
             isAdd = true;
         }
         sprints = await _serviceNowAPI.GetSprints();
+
+        // sort sprints by description
+        sprints = sprints.OrderBy(s => s.Short_description).ToList();
     }
 
 }
