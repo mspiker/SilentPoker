@@ -8,8 +8,14 @@ namespace EndpointAPI
 
         public EndpointLibrary(string BaseAddress, string AuthorizationHeader)
         {
-            _httpClient = new HttpClient { BaseAddress = new Uri(BaseAddress) };
-            _httpClient.DefaultRequestHeaders.Add("Authorization", AuthorizationHeader);
+            try {
+                _httpClient = new HttpClient { BaseAddress = new Uri(BaseAddress) };
+                _httpClient.DefaultRequestHeaders.Add("Authorization", AuthorizationHeader);
+            } 
+            catch { 
+                // Do something here.
+            }
+            
         }
         public static string Endpoint(string table, string query, string fields)
         {
@@ -18,6 +24,8 @@ namespace EndpointAPI
         }
         public async Task<List<T>?> CallAPI<T>(string endpoint)
         {
+            if (_httpClient == null) return new List<T>();
+
             var response = await _httpClient.GetAsync(endpoint);
             response.EnsureSuccessStatusCode();
             if (response.IsSuccessStatusCode)

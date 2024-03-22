@@ -21,6 +21,7 @@ namespace SilentPoker.Services
         /// <returns>List of rooms</returns>
         public async Task<List<Room>> GetRooms()
         {
+            if (string.IsNullOrWhiteSpace(_connectionString)) return new List<Room>();
             // Get all rooms from the database
             return await _data.GetRecords<Room, dynamic>(
                 @"SELECT * FROM Rooms", 
