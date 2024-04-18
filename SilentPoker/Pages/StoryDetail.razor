@@ -7,7 +7,7 @@
 
 <tr>
     <th scope="row" class="align-top">
-        @Number
+        <a href="@Url" target="_blank">@Number</a>
     </th>
 
     <td scope="col" class="align-top">
@@ -147,6 +147,8 @@
     public double Variance { get; set; }
     [Parameter]
     public double Participation { get; set; }
+    [Parameter]
+    public string Url { get; set; }
 
 
     private async Task Cast(int vote, string story)
