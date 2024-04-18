@@ -109,6 +109,8 @@
                         {
                             @foreach (Story story in stories)
                             {
+                                story.CaclulateVote(members);
+
                                 <StoryDetail SystemID="@story.Sys_id"
                                              Number="@story.Number"
                                              Description="@UIServices.TrimLongWords(story.Description, 18)"
@@ -119,7 +121,10 @@
                                              Priority="@story.Priority"
                                              OpenVoting="@room.OpenVoting"
                                              Votes="@story.Votes"
-                                             Members="@members"/>
+                                             Members="@members"
+                                             Average=@story.VoteAverage
+                                             Participation=@story.VoteParticipation
+                                             Variance=@story.VoteVariance/>
                             }
                         }
                     }

@@ -90,22 +90,22 @@
                 }
                 if (Votes.Count > 0)
                 {
-                    var total = Votes.Sum(v => v.VoteValue);
+@*                     var total = Votes.Sum(v => v.VoteValue);
                     var average = total / Votes.Count;
                     var variance = Votes.Sum(v => Math.Pow(v.VoteValue - average, 2));
                     
                     // calculate participation and display as a decimal
                     var participation = (Votes.Count * 1.0 / Members.Count * 1.0) ;
-                    
+ *@                    
                     <div class="border-top mt-1">
                         <span class="badge bg-light text-dark" data-bs-toggle="tooltip" title="Variance, lower numbers indicate team agreement" style="cursor: pointer">
-                            Var @String.Format("{0:0.0}", variance)
+                            Var @String.Format("{0:0.0}", Variance)
                         </span>
                         <span class="badge bg-light text-dark" data-bs-toggle="tooltip" title="Average, the average of all votes" style="cursor: pointer">
-                            Avg @average
+                            Avg @Average    
                         </span>
                         <span class="badge bg-light text-dark" data-bs-toggle="tooltip" title="Participation, percent of team casting a vote" style="cursor: pointer">
-                            Par @String.Format("{0:0.0}", participation)
+                            Par @String.Format("{0:0.0}", Participation)
                         </span>
                     </div>
                 }
@@ -141,6 +141,12 @@
     public List<Member>? Members { get; set; }
     [Parameter]
     public List<Vote>? Votes { get; set; } 
+    [Parameter]
+    public double Average { get; set; }
+    [Parameter]
+    public double Variance { get; set; }
+    [Parameter]
+    public double Participation { get; set; }
 
 
     private async Task Cast(int vote, string story)
