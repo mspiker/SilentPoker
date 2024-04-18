@@ -16,7 +16,7 @@ namespace SilentPoker.Models
         public double VoteAverage { get; set; }
         public double VoteVariance { get; set; }
         public double VoteParticipation { get; set; }
-        public string? Url { get => $"https://genesishcs.service-now.com/now/nav/ui/classic/params/target/rm_story.do%3Fsys_id%3D{Sys_id}%26sysparm_stack%3D%26sysparm_view%3D"; }
+        public string? Url { get => $"/now/nav/ui/classic/params/target/rm_story.do%3Fsys_id%3D{Sys_id}%26sysparm_stack%3D%26sysparm_view%3D"; }
 
         public void CaclulateVote(List<Member> roomMembers)
         {
