@@ -16,7 +16,6 @@
         <div class="col-12 mb-3">
             @if (room != null)
             {
-                
                 if (room.OpenVoting)
                 {
                     
@@ -27,9 +26,19 @@
                         Voting is closed for this room.  Votes displayed are the voting results, hover over the vote to reveal who voted.
                     </div>
                 }
-                @foreach (var member in members)
+                votingMembers = 0;
+                foreach (var member in members)
                 {
-                    <span class="badge bg-secondary me-1">@member.UserId</span>
+                    if (member.Role == MemberRole.Developer || member.Role == MemberRole.ScrumMaster)
+                    {
+                        <span class="badge bg-primary me-1">@member.UserId</span>
+                        votingMembers++;
+                    }
+                    else
+                    {
+                        <span class="badge bg-secondary me-1">@member.UserId</span>
+                    }
+
                 }
             }
         </div>
@@ -71,7 +80,18 @@
             } 
             else
             {
-                <span class="text-muted me-1">and has @members.Count members voting.</span>
+                <span class="text-muted me-1">and has @members.Count members.</span>
+                if (members.Count != 0 && votingMembers == members.Count)
+                {
+                    <span class="text-muted me-1">All members can vote.</span>
+                }
+                else
+                {
+                    if (members.Count !=0)
+                    {
+                        <span class="text-muted me-1">Only @votingMembers member(s) can vote.</span>
+                    }
+                }
             }
             @if (room.Filter == "")
             {
@@ -111,21 +131,11 @@
                             {
                                 story.CaclulateVote(members);
 
-                                <StoryDetail SystemID="@story.Sys_id"
-                                             Number="@story.Number"
-                                             Description="@UIServices.TrimLongWords(story.Description, 18)"
-                                             ShortDescription="@UIServices.TrimLongWords(story.Short_description, 18)"
-                                             MyVote="@story.MyVote"
-                                             AllowPass="@room.AllowPass"
-                                             Product="@story.Product"
-                                             Priority="@story.Priority"
+                                <StoryDetail AllowPass="@room.AllowPass"
                                              OpenVoting="@room.OpenVoting"
-                                             Votes="@story.Votes"
-                                             Members="@members"
-                                             Average=@story.VoteAverage
-                                             Participation=@story.VoteParticipation
-                                             Variance=@story.VoteVariance
-                                             Url=@story.Url/>
+                                             Story=@story
+                                             UserRole=@currentRole
+                                             Members=@members/>
                             }
                         }
                     }
@@ -144,7 +154,9 @@
     List<Story>? stories;
     List<Member>? members;
     public int roomSelected { get; set; }
+    public int votingMembers { get; set; }
     public string? user { get; set; }
+    public MemberRole currentRole { get; set; }
 
     private Estimator estimatorModal;
 
@@ -157,6 +169,8 @@
     {
         user = HttpContextAccessor.HttpContext?.User.Identity?.Name;
         rooms = await _pokerDatabase.GetRooms();
+
+        
     }
 
     private async Task GetStories()
@@ -191,6 +205,15 @@
                     story.Votes = await _pokerDatabase.GetVotesForStory(story.Sys_id);
                 }
             }
+            // Determine current users role
+            foreach (var member in members)
+            {
+                if (member.UserId == user)
+                {
+                    currentRole = member.Role;
+                }
+            }
+
         } else 
         {
             stories = null;

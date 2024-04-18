@@ -28,6 +28,7 @@ namespace SilentPoker.Models
             {
                 if (member.Role == MemberRole.Developer || member.Role == MemberRole.ScrumMaster)
                 {
+                    // Developer and Scrum Master votes count
                     qualifyingMembers++;
                     if (Votes.Any(v => v.UserId == member.UserId))
                     {
@@ -55,8 +56,6 @@ namespace SilentPoker.Models
                     this.VoteVariance = Votes.Sum(v => Math.Pow(v.VoteValue - VoteAverage, 2));
                 }
             }
-
-            
         }
 
     }
