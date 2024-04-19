@@ -129,13 +129,14 @@
                         {
                             @foreach (Story story in stories)
                             {
-                                story.CaclulateVote(members);
+                                story.CaclulateVote(room);
 
                                 <StoryDetail AllowPass="@room.AllowPass"
                                              OpenVoting="@room.OpenVoting"
                                              Story=@story
                                              UserRole=@currentRole
-                                             Members=@members/>
+                                             Room=@room
+                                             />
                             }
                         }
                     }
@@ -181,6 +182,7 @@
         {
             room = await _pokerDatabase.GetRoom(roomSelected);
             members = await _pokerDatabase.GetMembers(roomSelected);
+            room.Members = members;
 
             if (room != null)
             {

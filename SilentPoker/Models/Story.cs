@@ -1,4 +1,5 @@
-﻿using static System.Net.WebRequestMethods;
+﻿using System.Diagnostics.Metrics;
+using static System.Net.WebRequestMethods;
 
 namespace SilentPoker.Models
 {
@@ -18,44 +19,56 @@ namespace SilentPoker.Models
         public double VoteParticipation { get; set; }
         public string? Url { get => $"/now/nav/ui/classic/params/target/rm_story.do%3Fsys_id%3D{Sys_id}%26sysparm_stack%3D%26sysparm_view%3D"; }
 
-        public void CaclulateVote(List<Member> roomMembers)
+        public void CaclulateVote(Room room)
         {
-            // Determine qualifying votes
-            int qualifyingMembers = 0;
+            int membersCastingVote = 0;
+            int qualifiedMembers = 0;
             int votingMembers = 0;
             int sumOfVotes = 0;
-            foreach (var member in roomMembers)
+
+            List<Vote> _votes = new List<Vote>();
+
+            // Build a local list of votes to work with
+            foreach(var vote in Votes)
+                _votes.Add(new Vote { UserId = vote.UserId, VoteValue = vote.VoteValue });
+
+            // Get the number of eligible voting members
+            votingMembers = room.Members.Count(m => m.Role == MemberRole.Developer || m.Role == MemberRole.ScrumMaster);
+                        
+            // Remove any votes that are not from developers or scrum masters since only their votes will count
+            _votes.RemoveAll(v => !room.Members.Any(m => m.UserId == v.UserId && (m.Role == MemberRole.Developer || m.Role == MemberRole.ScrumMaster)));
+
+            // Trim the votes to remove the highest and lowest values
+            _votes = (room.Trimming) ? _votes.OrderBy(v => v.VoteValue).Skip(1).Take(_votes.Count - 2).ToList() : _votes;
+
+            // Calculate the average, variance, and participation
+            foreach (var vote in _votes)
             {
-                if (member.Role == MemberRole.Developer || member.Role == MemberRole.ScrumMaster)
+                if (vote.VoteValue > -1)
                 {
-                    // Developer and Scrum Master votes count
-                    qualifyingMembers++;
-                    if (Votes.Any(v => v.UserId == member.UserId))
-                    {
-                        votingMembers++;
-                        sumOfVotes += Votes.First(v => v.UserId == member.UserId).VoteValue;
-                    }
+                    membersCastingVote++;
+                    sumOfVotes += vote.VoteValue;
                 }
             }
 
-            if (Votes == null || Votes.Count == 0 || qualifyingMembers == 0)
+            // So we are not incorrectly showing a lower participation rate we need a list of the members who voted regardless of trimming.
+            foreach (var vote in Votes)
             {
-                
-            } else
-            {
-                if (votingMembers == 0)
-                {
-                    this.VoteAverage = 0;
-                    this.VoteParticipation = 0;
-                    this.VoteVariance = 0;
-                }
-                else
-                {
-                    this.VoteAverage = sumOfVotes / votingMembers;
-                    this.VoteParticipation = (votingMembers * 1.0) / (qualifyingMembers * 1.0);
-                    this.VoteVariance = Votes.Sum(v => Math.Pow(v.VoteValue - VoteAverage, 2));
-                }
+                // If there is an entry in the Votes object, they have voted.
+                qualifiedMembers++;
             }
+
+            // Nothing to calculate if there are no qualified members
+            if (membersCastingVote == 0)
+            {
+                VoteAverage = 0;
+                VoteVariance = 0;
+                VoteParticipation = 0;
+                return;
+            }
+            VoteAverage = sumOfVotes / membersCastingVote;
+            VoteVariance = _votes.Sum(v => Math.Pow(v.VoteValue - VoteAverage, 2)) / membersCastingVote;
+            VoteParticipation = 100 * ((qualifiedMembers * 1.0) / (votingMembers * 1.0));
         }
 
     }

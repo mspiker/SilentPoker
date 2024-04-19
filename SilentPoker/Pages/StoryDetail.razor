@@ -120,7 +120,7 @@
     [Parameter]
     public MemberRole UserRole { get; set; }
     [Parameter]
-    public List<Member> Members { get; set; }
+    public Room Room { get; set; }
 
     private async Task Cast(int vote, string story)
     {
@@ -129,6 +129,6 @@
         Story.MyVote = vote;
 
         Story.Votes = await _pokerDatabase.GetVotesForStory(story);
-        Story.CaclulateVote(Members);
+        Story.CaclulateVote(Room);
     }
 }

@@ -165,15 +165,16 @@ namespace SilentPoker.Services
         {
             // Add a new room to the database
             await _data.Execute(
-                @"INSERT INTO Rooms (Name, Sprint, Filter, AllowPass, OpenVoting) 
-                    VALUES (@Name, @Sprint, @Filter, @AllowPass, @OpenVoting);", 
+                @"INSERT INTO Rooms (Name, Sprint, Filter, AllowPass, OpenVoting, Trimming) 
+                    VALUES (@Name, @Sprint, @Filter, @AllowPass, @OpenVoting, @Trimming);", 
                 new
                 {
                     room.Name,
                     room.Sprint,
                     room.Filter,
                     room.AllowPass,
-                    room.OpenVoting
+                    room.OpenVoting,
+                    room.Trimming
                 }, 
                 _connectionString);
         }
@@ -188,7 +189,7 @@ namespace SilentPoker.Services
             // Update a room in the database
             await _data.Execute(
                 @"UPDATE Rooms 
-                    SET Name = @Name, Sprint = @Sprint, Filter = @Filter, AllowPass = @AllowPass, OpenVoting = @OpenVoting 
+                    SET Name = @Name, Sprint = @Sprint, Filter = @Filter, AllowPass = @AllowPass, OpenVoting = @OpenVoting, Trimming = @Trimming
                     WHERE Id = @Id;", 
                 new {
                     room.Id,
@@ -196,7 +197,8 @@ namespace SilentPoker.Services
                     room.Sprint,
                     room.Filter,
                     room.AllowPass,
-                    room.OpenVoting
+                    room.OpenVoting,
+                    room.Trimming
                 }, 
                 _connectionString);
         }
