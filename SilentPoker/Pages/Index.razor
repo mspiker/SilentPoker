@@ -9,7 +9,7 @@
 @inject ServiceNowAPI _serviceNowAPI
 @inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
 
-<PageTitle>Index</PageTitle>
+<PageTitle>Silent Poker</PageTitle>
 
 <div class="container-fluid">
     <div class="row">
@@ -38,13 +38,10 @@
                     {
                         <span class="badge bg-secondary me-1">@member.UserId</span>
                     }
-
                 }
             }
         </div>
         <div class="col-8">
-            
-            
             <select @bind="roomSelected" class="form-control" id="Room" aria-describedby="NameHelp">
                   
                 @if (rooms == null)
@@ -59,7 +56,6 @@
                         <option value="@room.Id">@room.Name</option>    
                     }
                 }
-                
             </select>
         </div>
     
@@ -130,13 +126,7 @@
                             @foreach (Story story in stories)
                             {
                                 story.CaclulateVote(room);
-
-                                <StoryDetail AllowPass="@room.AllowPass"
-                                             OpenVoting="@room.OpenVoting"
-                                             Story=@story
-                                             UserRole=@currentRole
-                                             Room=@room
-                                             />
+                                <StoryDetail Story=@story Room=@room />
                             }
                         }
                     }
@@ -157,8 +147,6 @@
     public int roomSelected { get; set; }
     public int votingMembers { get; set; }
     public string? user { get; set; }
-    public MemberRole currentRole { get; set; }
-
     private Estimator estimatorModal;
 
     private void ShowEstimator()
@@ -170,8 +158,6 @@
     {
         user = HttpContextAccessor.HttpContext?.User.Identity?.Name;
         rooms = await _pokerDatabase.GetRooms();
-
-        
     }
 
     private async Task GetStories()
@@ -192,7 +178,7 @@
                     votes = await _pokerDatabase.GetVotesForUser(user);
                 }   
             }
-            
+
             if (stories != null)
             {
                 foreach (Story story in stories)
@@ -204,18 +190,12 @@
                         if (i != null)
                             story.MyVote = i.VoteValue;
                     }
-                    story.Votes = await _pokerDatabase.GetVotesForStory(story.Sys_id);
+                    if (story.Sys_id != null)
+                    {
+                        story.Votes = await _pokerDatabase.GetVotesForStory(story.Sys_id);
+                    }
                 }
             }
-            // Determine current users role
-            foreach (var member in members)
-            {
-                if (member.UserId == user)
-                {
-                    currentRole = member.Role;
-                }
-            }
-
         } else 
         {
             stories = null;

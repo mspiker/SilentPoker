@@ -25,7 +25,7 @@
                 <span><i class="bi bi-clock-history"></i> @Story.Priority</span>
             </p>
         
-            @if (OpenVoting && Story.Sys_id != null) {
+            @if (Room.OpenVoting && Story.Sys_id != null) {
                 <div class="p-3 pt-1 border border-4">
                     <p class="fs-5 m-0">Vote</p>
                     <p class="fs-6 text-muted">Select your vote from the options below. The Estimator will help you decide the story points to select.</p>
@@ -40,7 +40,7 @@
                     <button type="button" @onclick="@(e => Cast(13, Story.Sys_id))" class="me-0 @VotingService.Vote(13).VoteStyle">@VotingService.Vote(13).VoteCard</button>
                     <button type="button" @onclick="@(e => Cast(20, Story.Sys_id))" class="me-0 @VotingService.Vote(20).VoteStyle">@VotingService.Vote(20).VoteCard</button>
                     <button type="button" @onclick="@(e => Cast(40, Story.Sys_id))" class="me-1 @VotingService.Vote(40).VoteStyle">@VotingService.Vote(40).VoteCard</button>
-                    @if (AllowPass)
+                    @if (Room.AllowPass)
                     {
                         <span>
                             <button type="button" @onclick="@(e => Cast(-2, Story.Sys_id))" class="me-1 @VotingService.Vote(-2).VoteStyle">@VotingService.Vote(-2).VoteCard</button>
@@ -72,14 +72,14 @@
     </td>
     
     <td scope="col" class="align-top">
-        @if (OpenVoting || UserRole == MemberRole.ScrumMaster)
+        @if (Room.OpenVoting || UserRole == MemberRole.ScrumMaster)
         {
             <span class="@VotingService.Vote(Story.MyVote).VoteStyle">
                 @VotingService.Vote(Story.MyVote).VoteText
             </span>
         }
         
-        @if (OpenVoting == false || UserRole == MemberRole.ScrumMaster || UserRole == MemberRole.ProductOwner || UserRole == MemberRole.Observer) 
+        @if (Room.OpenVoting == false || UserRole == MemberRole.ScrumMaster || UserRole == MemberRole.ProductOwner || UserRole == MemberRole.Observer) 
         {
             @if (Story.Votes != null)
             {
@@ -111,24 +111,30 @@
 
 
 @code {
+    
     [Parameter]
     public Story Story { get; set; }
     [Parameter]
-    public bool AllowPass { get; set; }
-    [Parameter]
-    public bool OpenVoting { get; set; }
-    [Parameter]
-    public MemberRole UserRole { get; set; }
-    [Parameter]
     public Room Room { get; set; }
+    
+    public MemberRole UserRole { get; set; }
+    public string? user = String.Empty;
 
     private async Task Cast(int vote, string story)
     {
-        var user = HttpContextAccessor.HttpContext?.User.Identity?.Name;
-        await _pokerDatabase.CastVote(vote, story, user);
-        Story.MyVote = vote;
+        if (user != null) 
+        {
+            await _pokerDatabase.CastVote(vote, story, user);
+            Story.MyVote = vote;
+            Story.Votes = await _pokerDatabase.GetVotesForStory(story);
+            Story.CaclulateVote(Room);
+        }
+    }
 
-        Story.Votes = await _pokerDatabase.GetVotesForStory(story);
-        Story.CaclulateVote(Room);
+    protected override void OnInitialized()
+    {
+        user = HttpContextAccessor.HttpContext?.User.Identity?.Name;
+        Member member = Room.Members.FirstOrDefault(item => item.UserId == user);
+        UserRole = (member != null) ? member.Role : MemberRole.Observer;
     }
 }
