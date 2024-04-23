@@ -5,5 +5,6 @@
         public string? StoryId { get; set; }
         public string? UserId { get; set; }
         public int VoteValue { get; set; }
+        public string Comment { get; set; }
     }
 }

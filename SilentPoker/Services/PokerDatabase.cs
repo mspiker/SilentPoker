@@ -1,6 +1,7 @@
 ﻿using DataLibrary;
 using Microsoft.Extensions.Configuration;
 using SilentPoker.Models;
+using System.Xml.Linq;
 
 namespace SilentPoker.Services
 {
@@ -39,17 +40,62 @@ namespace SilentPoker.Services
         public async Task CastVote(int vote, string storyId, string userId)
         {
             // Remove any existing votes for a story from the database
-            await _data.Execute(
-                "DELETE FROM Votes WHERE StoryId = @StoryId AND UserId = @UserId",
+            //await _data.Execute(
+            //    "DELETE FROM Votes WHERE StoryId = @StoryId AND UserId = @UserId",
+            //    new { StoryId = storyId, UserId = userId },
+            //    _connectionString);
+
+            // Does a vote already exist for the user and story ID?
+            var votes = await _data.GetRecords<Vote, dynamic>(
+                @"SELECT * FROM Votes WHERE StoryId = @StoryId AND UserId = @UserId",
                 new { StoryId = storyId, UserId = userId },
                 _connectionString);
 
-            // Add a new vote to the database
-            await _data.Execute(
-                @"INSERT INTO Votes (VoteValue, StoryId, UserId) 
-                    VALUES (@VoteValue, @StoryId, @UserId);", 
-                new { VoteValue = vote, StoryId = storyId, UserId = userId }, 
+            if (votes.Count > 0)
+            {
+                // Update the existing vote with the vote value
+                await _data.Execute(
+                    @"UPDATE Votes SET VoteValue = @VoteValue WHERE StoryId = @StoryId AND UserId = @UserId",
+                    new { VoteValue = vote, StoryId = storyId, UserId = userId },
+                    _connectionString);
+            }
+            else
+            {
+                // Add a new vote to the database
+                await _data.Execute(
+                    @"INSERT INTO Votes (VoteValue, StoryId, UserId) 
+                    VALUES (@VoteValue, @StoryId, @UserId);",
+                    new { VoteValue = vote, StoryId = storyId, UserId = userId },
+                    _connectionString);
+            }
+        }
+
+        public async Task SaveComment(string comment, string storyId, string userId)
+        {
+
+            // Does a vote already exist for the user and story ID?
+            var votes = await _data.GetRecords<Vote, dynamic>(
+                @"SELECT * FROM Votes WHERE StoryId = @StoryId AND UserId = @UserId",
+                new { StoryId = storyId, UserId = userId },
                 _connectionString);
+
+            if (votes.Count > 0)
+            {
+                // Update the existing vote with the comment
+                await _data.Execute(
+                    @"UPDATE Votes SET Comment = @Comment WHERE StoryId = @StoryId AND UserId = @UserId", 
+                    new { Comment = comment, StoryId = storyId, UserId = userId }, 
+                    _connectionString);
+            }
+            else
+            {
+                // Add a new vote to the database
+                //await _data.Execute(
+                //    @"INSERT INTO Votes (VoteValue, StoryId, UserId, Comment) 
+                //    VALUES (-1, @StoryId, @UserId, @Comment);", 
+                //    new { StoryId = storyId, UserId = userId, Comment = comment }, 
+                //    _connectionString);
+            }
         }
 
         /// <summary>

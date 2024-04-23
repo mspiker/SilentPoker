@@ -25,10 +25,11 @@
                 <span><i class="bi bi-clock-history"></i> @Story.Priority</span>
             </p>
         
-            @if (Room.OpenVoting && Story.Sys_id != null) {
+            @if (Room.OpenVoting || UserRole == MemberRole.ScrumMaster)
+            {
                 <div class="p-3 pt-1 border border-4">
                     <p class="fs-5 m-0">Vote</p>
-                    <p class="fs-6 text-muted">Select your vote from the options below. The Estimator will help you decide the story points to select.</p>
+                    <p class="fs-6 text-muted">Select your vote from the options below.</p>
 
                     <button type="button" @onclick="@(e => Cast(-1, Story.Sys_id))" class="me-0 @VotingService.Vote(-1).VoteStyle">@VotingService.Vote(-1).VoteCard</button>
                     <button type="button" @onclick="@(e => Cast(0, Story.Sys_id))" class="me-0 @VotingService.Vote(0).VoteStyle">@VotingService.Vote(0).VoteCard</button>
@@ -46,17 +47,24 @@
                             <button type="button" @onclick="@(e => Cast(-2, Story.Sys_id))" class="me-1 @VotingService.Vote(-2).VoteStyle">@VotingService.Vote(-2).VoteCard</button>
                         </span>
                     }
-                    
+                    @if(Story.MyVote != -3)
+                    {
+                        <p class="mt-3">
+                            <textarea @onblur="Comment" class="form-control" rows="3" placeholder="Comment" @bind="Story.MyComment" maxlength="250"></textarea>
+                        </p>
+                    }
                 </div>
+                
             }
-            else
+
+            @if (Room.OpenVoting = false || UserRole == MemberRole.ScrumMaster || UserRole == MemberRole.ProductOwner || UserRole == MemberRole.Observer)
             {
                 @if (Story.Votes == null)
                 {
                 }
                 else
                 {
-                    @foreach (Vote vote in Story.Votes)
+                    @* @foreach (Vote vote in Story.Votes)
                     {
                         <span class="badge text-dark">
                             @vote.UserId 
@@ -64,8 +72,23 @@
                                 @VotingService.Vote(vote.VoteValue).VoteCard
                             </span>
                         </span>
+                    } *@
+                    foreach (Vote vote in Story.Votes)
+                    {
+                        <p class="mt-1">
+                            <span class="@VotingService.Vote(vote.VoteValue).VoteStyle" data-bs-toggle="tooltip" title="@vote.UserId" style="cursor: pointer">
+                                @VotingService.Vote(vote.VoteValue).VoteCard
+                            </span>
+                            <small class="text-muted">
+                                <strong>@vote.UserId</strong>
+                            @if(vote.Comment != null && vote.Comment != "")
+                            {
+                                <span class="text-muted">: @vote.Comment</span>
+                            }
+                            </small>
+                            
+                        </p>
                     }
-
                 }
             }
         </div>
@@ -78,7 +101,7 @@
                 @VotingService.Vote(Story.MyVote).VoteText
             </span>
         }
-        
+
         @if (Room.OpenVoting == false || UserRole == MemberRole.ScrumMaster || UserRole == MemberRole.ProductOwner || UserRole == MemberRole.Observer) 
         {
             @if (Story.Votes != null)
@@ -93,7 +116,7 @@
                 {
                     <div class="border-top mt-1">
                         <span class="badge bg-light text-dark" data-bs-toggle="tooltip" title="Variance, lower numbers indicate team agreement" style="cursor: pointer">
-                            Var @String.Format("{0:0.0}", Story.VoteVariance)
+                            @String.Format("Var {0:0.0}", Story.VoteVariance)
                         </span>
                         <span class="badge bg-light text-dark" data-bs-toggle="tooltip" title="Average, the average of all votes" style="cursor: pointer">
                             Avg @Story.VoteAverage    
@@ -127,6 +150,16 @@
             await _pokerDatabase.CastVote(vote, story, user);
             Story.MyVote = vote;
             Story.Votes = await _pokerDatabase.GetVotesForStory(story);
+            Story.CaclulateVote(Room);
+        }
+    }
+
+    private async Task Comment()
+    {
+        if (user != null)
+        {
+            await _pokerDatabase.SaveComment(Story.MyComment, Story.Sys_id, user);
+            Story.Votes = await _pokerDatabase.GetVotesForStory(Story.Sys_id);
             Story.CaclulateVote(Room);
         }
     }

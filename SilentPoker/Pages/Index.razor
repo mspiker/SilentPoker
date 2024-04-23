@@ -188,7 +188,10 @@
                     {
                         var i = votes.FirstOrDefault(item => item.StoryId == story.Sys_id);
                         if (i != null)
+                        {
                             story.MyVote = i.VoteValue;
+                            story.MyComment = i.Comment;
+                        }
                     }
                     if (story.Sys_id != null)
                     {

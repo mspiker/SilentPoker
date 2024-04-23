@@ -1,4 +1,5 @@
-﻿using System.Diagnostics.Metrics;
+﻿using Microsoft.Extensions.Diagnostics.HealthChecks;
+using System.Diagnostics.Metrics;
 using static System.Net.WebRequestMethods;
 
 namespace SilentPoker.Models
@@ -12,6 +13,7 @@ namespace SilentPoker.Models
         public string? Number { get; set; }
         public string? Sys_id { get; set; }
         public int MyVote { get; set; }
+        public string MyComment { get; set; }
         public string? Priority { get; set; }
         public List<Vote>? Votes { get; set; }
         public double VoteAverage { get; set; }
